@@ -22,8 +22,12 @@ module Gem::InstallUpdateOptions
   # Add the install/update options to the option parser.
 
   def add_install_update_options
+    # TODO: use @parser.accept
     OptionParser.accept Gem::Security::Policy do |value|
       require 'rubygems/security'
+
+      raise OptionParser::InvalidArgument, 'OpenSSL not installed' unless
+        defined?(Gem::Security::HighSecurity)
 
       value = Gem::Security::Policies[value]
       valid = Gem::Security::Policies.keys.sort
@@ -44,15 +48,37 @@ module Gem::InstallUpdateOptions
       options[:bin_dir] = File.expand_path(value)
     end
 
-    add_option(:"Install/Update", '-d', '--[no-]document [TYPES]', Array,
+    add_option(:"Install/Update",       '--[no-]document [TYPES]', Array,
                'Generate documentation for installed gems',
                'List the documentation types you wish to',
                'generate.  For example: rdoc,ri') do |value, options|
       options[:document] = case value
-                           when nil   then %w[rdoc ri]
+                           when nil   then %w[ri]
                            when false then []
                            else            value
                            end
+    end
+
+    add_option(:"Install/Update", '--build-root DIR',
+               'Temporary installation root. Useful for building',
+               'packages. Do not use this when installing remote gems.') do |value, options|
+      options[:build_root] = File.expand_path(value)
+    end
+
+    add_option(:"Install/Update", '--vendor',
+               'Install gem into the vendor directory.',
+               'Only for use by gem repackagers.') do |value, options|
+      unless Gem.vendor_dir then
+        raise OptionParser::InvalidOption.new 'your platform is not supported'
+      end
+
+      options[:vendor] = true
+      options[:install_dir] = Gem.vendor_dir
+    end
+
+    add_option(:"Install/Update", '-N', '--no-document',
+               'Disable documentation generation') do |value, options|
+      options[:document] = []
     end
 
     add_option(:Deprecated, '--[no-]rdoc',
@@ -106,12 +132,6 @@ module Gem::InstallUpdateOptions
     add_option(:"Install/Update", '--ignore-dependencies',
                'Do not install any required dependent gems') do |value, options|
       options[:ignore_dependencies] = value
-    end
-
-    add_option(:"Install/Update", '-y', '--include-dependencies',
-               'Unconditionally install the required',
-               'dependent gems') do |value, options|
-      options[:include_dependencies] = value
     end
 
     add_option(:"Install/Update",       '--[no-]format-executable',

@@ -1,15 +1,25 @@
-require 'rubygems/test_case'
 require 'rubygems'
+require 'rubygems/test_case'
 require 'rubygems/rdoc'
 
 class TestGemRDoc < Gem::TestCase
+  Gem::RDoc.load_rdoc
+  rdoc_4 = Gem::Requirement.new('> 3').satisfied_by?(Gem::RDoc.rdoc_version)
 
   def setup
     super
 
-    @a = quick_spec 'a'
+    @a = util_spec 'a' do |s|
+      s.rdoc_options = %w[--main MyTitle]
+      s.extra_rdoc_files = %w[README]
+    end
 
-    @rdoc = Gem::RDoc.new @a
+    write_file File.join(@tempdir, 'lib', 'a.rb')
+    write_file File.join(@tempdir, 'README')
+
+    install_gem @a
+
+    @hook = Gem::RDoc.new @a
 
     begin
       Gem::RDoc.load_rdoc
@@ -20,17 +30,30 @@ class TestGemRDoc < Gem::TestCase
     Gem.configuration[:rdoc] = nil
   end
 
-  def rdoc_3?
-    Gem::Requirement.new('>= 3').satisfied_by? @rdoc.class.rdoc_version
+  ##
+  # RDoc 4 ships with its own Gem::RDoc which overrides this one which is
+  # shipped for backwards compatibility.
+
+  def rdoc_4?
+    Gem::Requirement.new('>= 4.0.0.preview2').satisfied_by? \
+      @hook.class.rdoc_version
   end
 
-  def rdoc_3_8?
-    Gem::Requirement.new('>= 3.8').satisfied_by? @rdoc.class.rdoc_version
+  def rdoc_3?
+    Gem::Requirement.new('~> 3.0').satisfied_by? @hook.class.rdoc_version
+  end
+
+  def rdoc_3_8_or_better?
+    Gem::Requirement.new('>= 3.8').satisfied_by? @hook.class.rdoc_version
   end
 
   def test_initialize
-    assert @rdoc.generate_rdoc
-    assert @rdoc.generate_ri
+    if rdoc_4? then
+      refute @hook.generate_rdoc
+    else
+      assert @hook.generate_rdoc
+    end
+    assert @hook.generate_ri
 
     rdoc = Gem::RDoc.new @a, false, false
 
@@ -46,152 +69,153 @@ class TestGemRDoc < Gem::TestCase
       -p
     ]
 
-    @rdoc.delete_legacy_args args
+    @hook.delete_legacy_args args
 
     assert_empty args
   end
 
   def test_document
-    skip 'RDoc 3+ required' unless rdoc_3?
+    skip 'RDoc 3 required' unless rdoc_3?
 
     options = RDoc::Options.new
     options.files = []
 
-    @rdoc.instance_variable_set :@rdoc, @rdoc.new_rdoc
-    @rdoc.instance_variable_set :@file_info, []
+    rdoc = @hook.new_rdoc
+    @hook.instance_variable_set :@rdoc, rdoc
+    @hook.instance_variable_set :@file_info, []
 
-    @rdoc.document 'darkfish', options, @a.doc_dir('rdoc')
+    @hook.document 'darkfish', options, @a.doc_dir('rdoc')
 
-    assert @rdoc.rdoc_installed?
-  end
+    assert @hook.rdoc_installed?
+  end unless rdoc_4
 
   def test_generate
-    skip 'RDoc 3+ required' unless rdoc_3?
+    skip 'RDoc 3 required' unless rdoc_3?
 
     FileUtils.mkdir_p @a.doc_dir
     FileUtils.mkdir_p File.join(@a.gem_dir, 'lib')
 
-    @rdoc.generate
+    @hook.generate
 
-    assert @rdoc.rdoc_installed?
-    assert @rdoc.ri_installed?
+    assert @hook.rdoc_installed?
+    assert @hook.ri_installed?
 
-    rdoc = @rdoc.instance_variable_get :@rdoc
+    rdoc = @hook.instance_variable_get :@rdoc
 
     refute rdoc.options.hyperlink_all
-  end
+  end unless rdoc_4
 
   def test_generate_configuration_rdoc_array
-    skip 'RDoc 3+ required' unless rdoc_3?
+    skip 'RDoc 3 required' unless rdoc_3?
 
     Gem.configuration[:rdoc] = %w[-A]
 
     FileUtils.mkdir_p @a.doc_dir
     FileUtils.mkdir_p File.join(@a.gem_dir, 'lib')
 
-    @rdoc.generate
+    @hook.generate
 
-    rdoc = @rdoc.instance_variable_get :@rdoc
+    rdoc = @hook.instance_variable_get :@rdoc
 
     assert rdoc.options.hyperlink_all
-  end
+  end unless rdoc_4
 
   def test_generate_configuration_rdoc_string
-    skip 'RDoc 3+ required' unless rdoc_3?
+    skip 'RDoc 3 required' unless rdoc_3?
 
     Gem.configuration[:rdoc] = '-A'
 
     FileUtils.mkdir_p @a.doc_dir
     FileUtils.mkdir_p File.join(@a.gem_dir, 'lib')
 
-    @rdoc.generate
+    @hook.generate
 
-    rdoc = @rdoc.instance_variable_get :@rdoc
+    rdoc = @hook.instance_variable_get :@rdoc
 
     assert rdoc.options.hyperlink_all
-  end
+  end unless rdoc_4
 
   def test_generate_disabled
-    @rdoc.generate_rdoc = false
-    @rdoc.generate_ri   = false
+    @hook.generate_rdoc = false
+    @hook.generate_ri   = false
 
-    @rdoc.generate
+    @hook.generate
 
-    refute @rdoc.rdoc_installed?
-    refute @rdoc.ri_installed?
+    refute @hook.rdoc_installed?
+    refute @hook.ri_installed?
   end
 
   def test_generate_force
-    skip 'RDoc 3+ required' unless rdoc_3?
+    skip 'RDoc 3 required' unless rdoc_3?
 
     FileUtils.mkdir_p @a.doc_dir 'ri'
     FileUtils.mkdir_p @a.doc_dir 'rdoc'
     FileUtils.mkdir_p File.join(@a.gem_dir, 'lib')
 
-    @rdoc.force = true
+    @hook.force = true
 
-    @rdoc.generate
+    @hook.generate
 
     assert_path_exists File.join(@a.doc_dir('rdoc'), 'index.html')
     assert_path_exists File.join(@a.doc_dir('ri'),   'cache.ri')
-  end
+  end unless rdoc_4
 
   def test_generate_no_overwrite
-    skip 'RDoc 3+ required' unless rdoc_3?
+    skip 'RDoc 3 required' unless rdoc_3?
 
     FileUtils.mkdir_p @a.doc_dir 'ri'
     FileUtils.mkdir_p @a.doc_dir 'rdoc'
     FileUtils.mkdir_p File.join(@a.gem_dir, 'lib')
 
-    @rdoc.generate
+    @hook.generate
 
     refute_path_exists File.join(@a.doc_dir('rdoc'), 'index.html')
     refute_path_exists File.join(@a.doc_dir('ri'),   'cache.ri')
-  end
+  end unless rdoc_4
 
   def test_generate_legacy
-    skip 'RDoc < 3.8 required' if rdoc_3_8?
+    skip 'RDoc < 3.8 required' if rdoc_3_8_or_better?
 
     FileUtils.mkdir_p @a.doc_dir
     FileUtils.mkdir_p File.join(@a.gem_dir, 'lib')
 
-    @rdoc.generate_legacy
+    @hook.generate_legacy
 
-    assert @rdoc.rdoc_installed?
-    assert @rdoc.ri_installed?
-  end
+    assert @hook.rdoc_installed?
+    assert @hook.ri_installed?
+  end unless rdoc_4
 
   def test_legacy_rdoc
-    skip 'RDoc < 3.8 required' if rdoc_3_8?
+    skip 'RDoc < 3.8 required' if rdoc_3_8_or_better?
 
     FileUtils.mkdir_p @a.doc_dir
     FileUtils.mkdir_p File.join(@a.gem_dir, 'lib')
 
-    @rdoc.legacy_rdoc '--op', @a.doc_dir('rdoc')
+    @hook.legacy_rdoc '--op', @a.doc_dir('rdoc')
 
-    assert @rdoc.rdoc_installed?
-  end
+    assert @hook.rdoc_installed?
+  end unless rdoc_4
 
   def test_new_rdoc
-    assert_kind_of RDoc::RDoc, @rdoc.new_rdoc
+    assert_kind_of RDoc::RDoc, @hook.new_rdoc
   end
 
   def test_rdoc_installed?
-    refute @rdoc.rdoc_installed?
+    refute @hook.rdoc_installed?
 
     FileUtils.mkdir_p @a.doc_dir 'rdoc'
 
-    assert @rdoc.rdoc_installed?
+    assert @hook.rdoc_installed?
   end
 
   def test_remove
     FileUtils.mkdir_p @a.doc_dir 'rdoc'
     FileUtils.mkdir_p @a.doc_dir 'ri'
 
-    @rdoc.remove
+    @hook.remove
 
-    refute @rdoc.rdoc_installed?
-    refute @rdoc.ri_installed?
+    refute @hook.rdoc_installed?
+    refute @hook.ri_installed?
 
     assert_path_exists @a.doc_dir
   end
@@ -202,24 +226,24 @@ class TestGemRDoc < Gem::TestCase
     FileUtils.chmod 0, @a.base_dir
 
     e = assert_raises Gem::FilePermissionError do
-      @rdoc.remove
+      @hook.remove
     end
 
     assert_equal @a.base_dir, e.directory
   ensure
-    FileUtils.chmod 0755, @a.base_dir
+    FileUtils.chmod(0755, @a.base_dir) if File.directory?(@a.base_dir)
   end
 
   def test_ri_installed?
-    refute @rdoc.ri_installed?
+    refute @hook.ri_installed?
 
     FileUtils.mkdir_p @a.doc_dir 'ri'
 
-    assert @rdoc.ri_installed?
+    assert @hook.ri_installed?
   end
 
   def test_setup
-    @rdoc.setup
+    @hook.setup
 
     assert_path_exists @a.doc_dir
   end
@@ -230,12 +254,15 @@ class TestGemRDoc < Gem::TestCase
     FileUtils.chmod 0, @a.doc_dir
 
     e = assert_raises Gem::FilePermissionError do
-      @rdoc.setup
+      @hook.setup
     end
 
     assert_equal @a.doc_dir, e.directory
   ensure
-    FileUtils.chmod 0755, @a.doc_dir
+    if File.exist? @a.doc_dir
+      FileUtils.chmod 0755, @a.doc_dir
+      FileUtils.rm_r @a.doc_dir
+    end
   end
 
 end

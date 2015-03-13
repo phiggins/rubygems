@@ -10,7 +10,7 @@ class TestGemCommandsSpecificationCommand < Gem::TestCase
   end
 
   def test_execute
-    foo = quick_spec 'foo'
+    foo = util_spec 'foo'
 
     install_specs foo
 
@@ -26,8 +26,8 @@ class TestGemCommandsSpecificationCommand < Gem::TestCase
   end
 
   def test_execute_all
-    quick_spec 'foo', '0.0.1'
-    quick_spec 'foo', '0.0.2'
+    util_spec 'foo', '0.0.1'
+    util_spec 'foo', '0.0.2'
 
     @cmd.options[:args] = %w[foo]
     @cmd.options[:all] = true
@@ -41,6 +41,24 @@ class TestGemCommandsSpecificationCommand < Gem::TestCase
     assert_match %r|version: 0.0.1|, @ui.output
     assert_match %r|version: 0.0.2|, @ui.output
     assert_equal '', @ui.error
+  end
+
+  def test_execute_all_conflicts_with_version
+    util_spec 'foo', '0.0.1'
+    util_spec 'foo', '0.0.2'
+
+    @cmd.options[:args] = %w[foo]
+    @cmd.options[:all] = true
+    @cmd.options[:version] = "1"
+
+    assert_raises Gem::MockGemUi::TermError do
+      use_ui @ui do
+        @cmd.execute
+      end
+    end
+
+    assert_equal '', @ui.output
+    assert_equal "ERROR:  Specify --all or -v, not both\n", @ui.error
   end
 
   def test_execute_bad_name
@@ -71,8 +89,8 @@ class TestGemCommandsSpecificationCommand < Gem::TestCase
   end
 
   def test_execute_exact_match
-    quick_spec 'foo'
-    quick_spec 'foo_bar'
+    util_spec 'foo'
+    util_spec 'foo_bar'
 
     @cmd.options[:args] = %w[foo]
 
@@ -99,6 +117,24 @@ class TestGemCommandsSpecificationCommand < Gem::TestCase
     assert_equal "foo", YAML.load(@ui.output)
   end
 
+  def test_execute_file
+    foo = util_spec 'foo' do |s|
+      s.files = %w[lib/code.rb]
+    end
+
+    util_build_gem foo
+
+    @cmd.options[:args] = [foo.cache_file]
+
+    use_ui @ui do
+      @cmd.execute
+    end
+
+    assert_match %r|Gem::Specification|, @ui.output
+    assert_match %r|name: foo|, @ui.output
+    assert_equal '', @ui.error
+  end
+
   def test_execute_marshal
     foo = new_spec 'foo', '2'
 
@@ -116,14 +152,9 @@ class TestGemCommandsSpecificationCommand < Gem::TestCase
   end
 
   def test_execute_remote
-    foo = quick_gem 'foo'
-
-    @fetcher = Gem::FakeFetcher.new
-    Gem::RemoteFetcher.fetcher = @fetcher
-
-    util_setup_spec_fetcher foo
-
-    FileUtils.rm File.join(@gemhome, 'specifications', foo.spec_name)
+    spec_fetcher do |fetcher|
+      fetcher.spec 'foo', 1
+    end
 
     @cmd.options[:args] = %w[foo]
     @cmd.options[:domain] = :remote
@@ -136,17 +167,30 @@ class TestGemCommandsSpecificationCommand < Gem::TestCase
     assert_match %r|name: foo|, @ui.output
   end
 
+  def test_execute_remote_with_version
+    spec_fetcher do |fetcher|
+      fetcher.spec 'foo', "1"
+      fetcher.spec 'foo', "2"
+    end
+
+    @cmd.options[:args] = %w[foo]
+    @cmd.options[:version] = "1"
+    @cmd.options[:domain] = :remote
+
+    use_ui @ui do
+      @cmd.execute
+    end
+
+    spec = Gem::Specification.from_yaml @ui.output
+
+    assert_equal Gem::Version.new("1"), spec.version
+  end
+
   def test_execute_remote_without_prerelease
-    foo = new_spec 'foo', '2.0.0'
-    foo_pre = new_spec 'foo', '2.0.1.pre'
-
-    install_specs foo, foo_pre
-
-    @fetcher = Gem::FakeFetcher.new
-    Gem::RemoteFetcher.fetcher = @fetcher
-
-    util_setup_spec_fetcher foo
-    util_setup_spec_fetcher foo_pre
+    spec_fetcher do |fetcher|
+      fetcher.spec 'foo', '2.0.0'
+      fetcher.spec 'foo', '2.0.1.pre'
+    end
 
     @cmd.options[:args] = %w[foo]
     @cmd.options[:domain] = :remote
@@ -164,16 +208,10 @@ class TestGemCommandsSpecificationCommand < Gem::TestCase
   end
 
   def test_execute_remote_with_prerelease
-    foo = new_spec 'foo', '2.0.0'
-    foo_pre = new_spec 'foo', '2.0.1.pre'
-
-    install_specs foo, foo_pre
-
-    @fetcher = Gem::FakeFetcher.new
-    Gem::RemoteFetcher.fetcher = @fetcher
-
-    util_setup_spec_fetcher foo
-    util_setup_spec_fetcher foo_pre
+    spec_fetcher do |fetcher|
+      fetcher.spec 'foo', '2.0.0'
+      fetcher.spec 'foo', '2.0.1.pre'
+    end
 
     @cmd.options[:args] = %w[foo]
     @cmd.options[:domain] = :remote
@@ -192,7 +230,7 @@ class TestGemCommandsSpecificationCommand < Gem::TestCase
   end
 
   def test_execute_ruby
-    foo = quick_spec 'foo'
+    foo = util_spec 'foo'
 
     install_specs foo
 

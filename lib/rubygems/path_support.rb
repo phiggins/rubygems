@@ -13,6 +13,10 @@ class Gem::PathSupport
   attr_reader :path
 
   ##
+  # Directory with spec cache
+  attr_reader :spec_cache_dir # :nodoc:
+
+  ##
   #
   # Constructor. Takes a single argument which is to be treated like a
   # hashtable, or defaults to ENV, the system environment.
@@ -28,16 +32,15 @@ class Gem::PathSupport
     end
 
     self.path = env["GEM_PATH"] || ENV["GEM_PATH"]
+
+    @spec_cache_dir =
+      env["GEM_SPEC_CACHE"] || ENV["GEM_SPEC_CACHE"] ||
+        Gem.default_spec_cache_dir
+
+    @spec_cache_dir = @spec_cache_dir.dup.untaint
   end
 
   private
-
-  ##
-  # Set the Gem home directory (as reported by Gem.dir).
-
-  def home=(home)
-    @home = home.to_s
-  end
 
   ##
   # Set the Gem search path (as reported by Gem.path).
@@ -54,7 +57,7 @@ class Gem::PathSupport
       if gpaths.kind_of?(Array)
         gem_path = gpaths.dup
       else
-        gem_path = gpaths.split(File::PATH_SEPARATOR)
+        gem_path = gpaths.split(Gem.path_separator)
       end
 
       if File::ALT_SEPARATOR then

@@ -10,18 +10,26 @@
 # class no matter if the full yaml library has loaded or not.
 #
 
-module YAML
+module YAML # :nodoc:
   # In newer 1.9.2, there is a Syck toplevel constant instead of it
-  # being underneith YAML. If so, reference it back under YAML as
+  # being underneath YAML. If so, reference it back under YAML as
   # well.
   if defined? ::Syck
+    # for tests that change YAML::ENGINE
+    # 1.8 does not support the second argument to const_defined?
+    remove_const :Syck rescue nil
+
     Syck = ::Syck
+
+  # JRuby's "Syck" is called "Yecht"
+  elsif defined? YAML::Yecht
+    Syck = YAML::Yecht
 
   # Otherwise, if there is no YAML::Syck, then we've got just psych
   # loaded, so lets define a stub for DefaultKey.
   elsif !defined? YAML::Syck
     module Syck
-      class DefaultKey
+      class DefaultKey # :nodoc:
       end
     end
   end
@@ -31,11 +39,15 @@ module YAML
   # should.
   module Syck
     class DefaultKey
+      remove_method :to_s rescue nil
+
       def to_s
         '='
       end
     end
   end
+
+  SyntaxError = Error unless defined? SyntaxError
 end
 
 # Sometime in the 1.9 dev cycle, the Syck constant was moved from under YAML
@@ -55,6 +67,9 @@ end
 # place to find the DefaultKey class for comparison.
 
 module Gem
+  # for tests that change YAML::ENGINE
+  remove_const :SyckDefaultKey if const_defined? :SyckDefaultKey
+
   SyckDefaultKey = YAML::Syck::DefaultKey
 end
 

@@ -3,6 +3,14 @@ require "rubygems/requirement"
 
 class TestGemRequirement < Gem::TestCase
 
+  def test_concat
+    r = req '>= 1'
+
+    r.concat ['< 2']
+
+    assert_equal [['>=', v(1)], ['<', v(2)]], r.requirements
+  end
+
   def test_equals2
     r = req "= 1.2"
     assert_equal r, r.dup
@@ -21,9 +29,32 @@ class TestGemRequirement < Gem::TestCase
     assert_requirement_equal "= 2", v(2)
   end
 
-  def test_class_available_as_gem_version_requirement
-    assert_same Gem::Requirement, Gem::Version::Requirement,
-      "Gem::Version::Requirement is aliased for old YAML compatibility."
+  def test_empty_requirements_is_none
+    r = Gem::Requirement.new
+    assert_equal true, r.none?
+  end
+
+  def test_explicit_default_is_none
+    r = Gem::Requirement.new ">= 0"
+    assert_equal true, r.none?
+  end
+
+  def test_basic_non_none
+    r = Gem::Requirement.new "= 1"
+    assert_equal false, r.none?
+  end
+
+  def test_for_lockfile
+    assert_equal ' (~> 1.0)', req('~> 1.0').for_lockfile
+
+    assert_equal ' (~> 1.0, >= 1.0.1)', req('>= 1.0.1', '~> 1.0').for_lockfile
+
+    duped = req '= 1.0'
+    duped.requirements << ['=', v('1.0')]
+
+    assert_equal ' (= 1.0)', duped.for_lockfile
+
+    assert_nil Gem::Requirement.default.for_lockfile
   end
 
   def test_parse
@@ -37,17 +68,19 @@ class TestGemRequirement < Gem::TestCase
   end
 
   def test_parse_bad
-    e = assert_raises Gem::Requirement::BadRequirementError do
-      Gem::Requirement.parse nil
+    [
+      nil,
+      '',
+      '! 1',
+      '= junk',
+      '1..2',
+    ].each do |bad|
+      e = assert_raises Gem::Requirement::BadRequirementError do
+        Gem::Requirement.parse bad
+      end
+
+      assert_equal "Illformed requirement [#{bad.inspect}]", e.message
     end
-
-    assert_equal 'Illformed requirement [nil]', e.message
-
-    e = assert_raises Gem::Requirement::BadRequirementError do
-      Gem::Requirement.parse ""
-    end
-
-    assert_equal 'Illformed requirement [""]', e.message
 
     assert_equal Gem::Requirement::BadRequirementError.superclass, ArgumentError
   end
@@ -174,6 +207,14 @@ class TestGemRequirement < Gem::TestCase
     end
   end
 
+  def test_satisfied_by_eh_tilde_gt_v0
+    r = req "~> 0.0.1"
+
+    refute_satisfied_by "0.1.1", r
+    assert_satisfied_by "0.0.2", r
+    assert_satisfied_by "0.0.1", r
+  end
+
   def test_satisfied_by_eh_good
     assert_satisfied_by "0.2.33",      "= 0.2.33"
     assert_satisfied_by "0.2.34",      "> 0.2.33"
@@ -244,6 +285,11 @@ class TestGemRequirement < Gem::TestCase
     refute_satisfied_by "1.1.pre", "~> 1.1"
     refute_satisfied_by "2.0.a",   "~> 1.0"
     refute_satisfied_by "2.0.a",   "~> 2.0"
+
+    refute_satisfied_by "0.9",     "~> 1"
+    assert_satisfied_by "1.0",     "~> 1"
+    assert_satisfied_by "1.1",     "~> 1"
+    refute_satisfied_by "2.0",     "~> 1"
   end
 
   def test_satisfied_by_eh_multiple
@@ -269,16 +315,6 @@ class TestGemRequirement < Gem::TestCase
     assert_satisfied_by "1.4.5", "~> 1.4.4"
     refute_satisfied_by "1.5",   "~> 1.4.4"
     refute_satisfied_by "2.0",   "~> 1.4.4"
-  end
-
-  def test_spaceship
-    Gem::Deprecate.skip_during do
-      assert_equal(-1, req("= 0") <=> req("= 1"))
-      assert_equal  0, req("= 0") <=> req("= 0")
-      assert_equal  1, req("= 1") <=> req("= 0")
-
-      assert_nil req("= 1") <=> v("42")
-    end
   end
 
   def test_specific
@@ -309,6 +345,16 @@ class TestGemRequirement < Gem::TestCase
     refute_satisfied_by "9.3.1",       ">= 9.3.2"
     refute_satisfied_by "9.3.03",      "<= 9.3.2"
     refute_satisfied_by "1.0.0.1",     "= 1.0"
+  end
+
+  def test_hash_with_multiple_versions
+    r1 = req('1.0', '2.0')
+    r2 = req('2.0', '1.0')
+    assert_equal r1.hash, r2.hash
+
+    r1 = req('1.0', '2.0').tap { |r| r.concat(['3.0']) }
+    r2 = req('3.0', '1.0').tap { |r| r.concat(['2.0']) }
+    assert_equal r1.hash, r2.hash
   end
 
   # Assert that two requirements are equal. Handles Gem::Requirements,

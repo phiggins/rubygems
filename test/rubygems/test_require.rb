@@ -1,20 +1,91 @@
 require 'rubygems/test_case'
 require 'rubygems'
 
-class TestRequire < Gem::TestCase
+class TestGemRequire < Gem::TestCase
+  class Latch
+    def initialize count = 1
+      @count = count
+      @lock  = Monitor.new
+      @cv    = @lock.new_cond
+    end
+
+    def release
+      @lock.synchronize do
+        @count -= 1 if @count > 0
+        @cv.broadcast if @count.zero?
+      end
+    end
+
+    def await
+      @lock.synchronize do
+        @cv.wait_while { @count > 0 }
+      end
+    end
+  end
+
+  def setup
+    super
+
+    assert_raises LoadError do
+      save_loaded_features do
+        require 'test_gem_require_a'
+      end
+    end
+  end
+
   def assert_require(path)
     assert require(path), "'#{path}' was already required"
   end
 
+  def append_latch spec
+    dir = spec.gem_dir
+    Dir.chdir dir do
+      spec.files.each do |file|
+        File.open file, 'a' do |fp|
+          fp.puts "FILE_ENTERED_LATCH.release"
+          fp.puts "FILE_EXIT_LATCH.await"
+        end
+      end
+    end
+  end
+
+  def test_concurrent_require
+    Object.const_set :FILE_ENTERED_LATCH, Latch.new(2)
+    Object.const_set :FILE_EXIT_LATCH, Latch.new(1)
+
+    a1 = new_spec "a", "1", nil, "lib/a.rb"
+    b1 = new_spec "b", "1", nil, "lib/b.rb"
+
+    install_specs a1, b1
+
+    append_latch a1
+    append_latch b1
+
+    t1 = Thread.new { assert_require 'a' }
+    t2 = Thread.new { assert_require 'b' }
+
+    # wait until both files are waiting on the exit latch
+    FILE_ENTERED_LATCH.await
+
+    # now let them finish
+    FILE_EXIT_LATCH.release
+
+    assert t1.join, "thread 1 should exit"
+    assert t2.join, "thread 2 should exit"
+  ensure
+    Object.send :remove_const, :FILE_ENTERED_LATCH
+    Object.send :remove_const, :FILE_EXIT_LATCH
+  end
+
   def test_require_is_not_lazy_with_exact_req
-    a1 = new_spec "a", "1", {"b" => "= 1"}, "lib/a.rb"
+    a1 = new_spec "a", "1", {"b" => "= 1"}, "lib/test_gem_require_a.rb"
     b1 = new_spec "b", "1", nil, "lib/b/c.rb"
     b2 = new_spec "b", "2", nil, "lib/b/c.rb"
 
     install_specs a1, b1, b2
 
     save_loaded_features do
-      assert_require 'a'
+      assert_require 'test_gem_require_a'
       assert_equal %w(a-1 b-1), loaded_spec_names
       assert_equal unresolved_names, []
 
@@ -24,14 +95,14 @@ class TestRequire < Gem::TestCase
   end
 
   def test_require_is_lazy_with_inexact_req
-    a1 = new_spec "a", "1", {"b" => ">= 1"}, "lib/a.rb"
+    a1 = new_spec "a", "1", {"b" => ">= 1"}, "lib/test_gem_require_a.rb"
     b1 = new_spec "b", "1", nil, "lib/b/c.rb"
     b2 = new_spec "b", "2", nil, "lib/b/c.rb"
 
     install_specs a1, b1, b2
 
     save_loaded_features do
-      assert_require 'a'
+      assert_require 'test_gem_require_a'
       assert_equal %w(a-1), loaded_spec_names
       assert_equal unresolved_names, ["b (>= 1)"]
 
@@ -41,13 +112,13 @@ class TestRequire < Gem::TestCase
   end
 
   def test_require_is_not_lazy_with_one_possible
-    a1 = new_spec "a", "1", {"b" => ">= 1"}, "lib/a.rb"
+    a1 = new_spec "a", "1", {"b" => ">= 1"}, "lib/test_gem_require_a.rb"
     b1 = new_spec "b", "1", nil, "lib/b/c.rb"
 
     install_specs a1, b1
 
     save_loaded_features do
-      assert_require 'a'
+      assert_require 'test_gem_require_a'
       assert_equal %w(a-1 b-1), loaded_spec_names
       assert_equal unresolved_names, []
 
@@ -56,17 +127,28 @@ class TestRequire < Gem::TestCase
     end
   end
 
-  def test_activate_via_require_respects_loaded_files
-    save_loaded_features do
-      require 'benchmark' # stdlib
+  def test_require_can_use_a_pathname_object
+    a1 = new_spec "a", "1", nil, "lib/test_gem_require_a.rb"
 
-      a1 = new_spec "a", "1", {"b" => ">= 1"}, "lib/a.rb"
+    install_specs a1
+
+    save_loaded_features do
+      assert_require Pathname.new 'test_gem_require_a'
+      assert_equal %w(a-1), loaded_spec_names
+      assert_equal unresolved_names, []
+    end
+  end
+
+  def test_activate_via_require_respects_loaded_files
+    require 'benchmark' # stdlib
+    save_loaded_features do
+      a1 = new_spec "a", "1", {"b" => ">= 1"}, "lib/test_gem_require_a.rb"
       b1 = new_spec "b", "1", nil, "lib/benchmark.rb"
       b2 = new_spec "b", "2", nil, "lib/benchmark.rb"
 
       install_specs a1, b1, b2
 
-      require 'a'
+      require 'test_gem_require_a'
       assert_equal unresolved_names, ["b (>= 1)"]
 
       refute require('benchmark'), "benchmark should have already been loaded"
@@ -149,6 +231,29 @@ class TestRequire < Gem::TestCase
       end
 
       assert_equal "unable to find a version of 'b' to activate", e.message
+    end
+  end
+
+  def test_default_gem_only
+    save_loaded_features do
+      default_gem_spec = new_default_spec("default", "2.0.0.0",
+                                          nil, "default/gem.rb")
+      install_default_specs(default_gem_spec)
+      assert_require "default/gem"
+      assert_equal %w(default-2.0.0.0), loaded_spec_names
+    end
+  end
+
+  def test_default_gem_and_normal_gem
+    save_loaded_features do
+      default_gem_spec = new_default_spec("default", "2.0.0.0",
+                                          nil, "default/gem.rb")
+      install_default_specs(default_gem_spec)
+      normal_gem_spec = new_spec("default", "3.0", nil,
+                                 "lib/default/gem.rb")
+      install_specs(normal_gem_spec)
+      assert_require "default/gem"
+      assert_equal %w(default-3.0), loaded_spec_names
     end
   end
 

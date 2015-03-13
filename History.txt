@@ -1,5 +1,1460 @@
 # coding: UTF-8
 
+=== 2.5.0
+
+Major enhancements:
+
+Minor enhancements:
+
+* Add `--skip=gem_name` to Pristine command.  Pull request #1018 by windwiny.
+* Moved description attribute to recommended for Gem::Specification.
+  Pull request #1046 by Michal Papis
+* Moved `Gem::Indexer#abbreviate` and `#sanitize` to `Gem::Specification`.
+  Pull request #1145 by Arthur Nogueira Neves
+* Cache Gem::Version segments for `#bump` and `#release`.
+  Pull request #1131 by Matijs van Zuijlen
+* Fix edge case in `levenshtein_distance` for comparing longer strings.
+  Pull request #1173 by Richard Schneeman
+
+Bug fixes:
+
+* Fixed Rake homepage url in example for Gem::Specification#homepage.
+  Pull request #1171 by Arthur Nogueira Neves
+
+=== 2.4.6 / 2014-02-05
+
+Bug fixes:
+
+* Fixed resolving gems with both upper and lower requirement boundaries.
+  Issue #1141 by Jakub Jirutka.
+* Moved extension directory after require_paths to fix missing constant bugs
+  in some gems with C extensions.  Issue #784 by André Arko, pull request
+  #1137 by Barry Allard.
+* Use Gem::Dependency#requirement when adding a dependency to an existing
+  dependency instance.  Pull request #1101 by Josh Cheek.
+* Fixed warning of shadowed local variable in Gem::Specification.  Pull request
+  #1109 by Rohit Arondekar
+* Gem::Requirement should always sort requirements before coercion to Hash.
+  Pull request #1139 by Eito Katagiri.
+* The `gem open` command should change the current working directory before
+  opening the editor.  Pull request #1142 by Alex Wood.
+* Ensure quotes are stripped from the Windows launcher script used to install
+  gems.  Pull request #1115 by Youngjun Song.
+* Fixed errors when writing to NFS to to 0444 files.  Issue #1161 by Emmanuel
+  Hadoux.
+* Removed dead code in Gem::StreamUI.  Pull request #1117 by mediaslave24.
+* Fixed typos.  Pull request #1096 by hakeda.
+* Relaxed CMake dependency for RHEL 6 and CentOS 6.  Pull request #1124 by Vít
+  Ondruch.
+* Relaxed Psych dependency.  Pull request #1128 by Vít Ondruch.
+
+=== 2.4.5 / 2014-12-03
+
+Bug fixes:
+
+* Improved speed of requiring gems.  (Around 25% for a 60 gem test).  Pull
+  request #1060 by unak.
+* RubyGems no longer attempts to look up gems remotely with the --local flag.
+  Pull request #1084 by Jeremy Evans.
+* Executable stubs use the correct gem version when RUBYGEMS_GEMDEPS is
+  active.  Issue #1072 by Michael Kaiser-Nyman.
+* Fixed handling of pinned gems in lockfiles with versions.  Issue #1078 by
+  Ian Ker-Seymer.
+* Fixed handling of git@example:gem.git URIs.  Issue #1054 by Mogutan Mogu.
+* Fixed handling of platforms retrieved from the dependencies API.  Issue
+  #1058 and patch suggestion by tux-mind.
+* RubyGems now suggests a copy-pasteable `gem pristine` command when
+  extensions are missing.  Pull request #1057 by Shannon Skipper.
+* Improved errors for long file names when packaging.  Pull request #1016 by
+  Piotrek Bator.
+* `gem pristine` now skips gems cannot be found remotely.  Pull request #1064
+  by Tuomas Kareinen.
+* `gem pristine` now caches gems to the proper directory.  Pull request #1064
+  by Tuomas Kareinen.
+* `gem pristine` now skips bundled gems properly.  Pull request #1064 by
+  Tuomas Kareinen.
+* Improved interoperability of Vagrant with RubyGems.  Pull request #1057 by
+  Vít Ondruch.
+* Renamed CONTRIBUTING to CONTRIBUTING.rdoc to allow markup.  Pull request
+  #1090 by Roberto Miranda.
+* Switched from #partition to #reject as only one collection is used.  Pull
+  request #1074 by Tuomas Kareinen.
+* Fixed installation of gems on systems using memory-mapped files.  Pull
+  request #1038 by Justin Li.
+* Fixed bug in Gem::Text#min3 where `a == b < c`.  Pull request #1026 by
+  fortissimo1997.
+* Fixed uninitialized variable warning in BasicSpecification.  Pull request
+  #1019 by Piotr Szotkowski.
+* Removed unneeded exception handling for cyclic dependencies.  Pull request
+  #1043 by Jens Wille.
+* Fixed grouped expression warning.  Pull request #1081 by André Arko.
+* Fixed handling of platforms when writing lockfiles.
+
+=== 2.4.4 / 2014-11-12
+
+Bug fixes:
+
+* Add alternate Root CA for upcoming certificate change. Fixes #1050 by
+  Protosac
+
+=== 2.4.3 / 2014-11-10
+
+Bug fixes:
+
+* Fix redefine MirrorCommand issue. Pull request #1044 by @akr.
+* Fix typo in platform= docs.  Pull request #1048 by @jasonrclark
+* Add root SSL certificates for upcoming certificate change.  Fixes #1050 by
+  Protosac
+
+=== 2.4.2 / 2014-10-01
+
+This release was sponsored by Ruby Central.
+
+Bug fixes:
+
+* RubyGems now correctly matches wildcard no_proxy hosts.  Issue #997 by
+  voelzemo.
+* Added support for missing git_source method in the gem dependencies API.
+* Fixed handling of git gems with an alternate install directory.
+* Lockfiles will no longer be truncated upon resolution errors.
+* Fixed messaging for `gem owner -a`.  Issue #1004 by Aaron Patterson, Ryan
+  Davis.
+* Removed meaningless ensure.  Pull request #1003 by gogotanaka.
+* Improved wording of --source option help.  Pull request #989 by Jason Clark.
+* Empty build_info files are now ignored.  Issue #903 by Adan Alvarado.
+* Gem::Installer ignores dependency checks when installing development
+  dependencies.  Issue #994 by Jens Willie.
+* `gem update` now continues after dependency errors.  Issue #993 by aaronchi.
+* RubyGems no longer warns about semantic version dependencies for the 0.x
+  range.  Issue #987 by Jeff Felchner, pull request #1006 by Hsing-Hui Hsu.
+* Added minimal lock to allow multithread installation of gems.  Issue #982
+  and pull request #1005 by Yorick Peterse
+* RubyGems now considers prerelease dependencies as it did in earlier versions
+  when --prerelease is given.  Issue #990 by Jeremy Tryba.
+* Updated capitalization in README.  Issue #1010 by Ben Bodenmiller.
+* Fixed activating gems from a Gemfile for default gems.  Issue #991 by khoan.
+* Fixed windows stub script generation for Cygwin.  Issue #1000 by Brett
+  DiFrischia.
+* Allow gem bindir and ruby.exe to live in separate diretories.  Pull request
+  #942 by Ian Flynn.
+* Fixed handling of gemspec in gem dependencies files to match Bundler
+  behavior.  Issue #1020 by Michal Papis.
+* Fixed `gem update` when updating to prereleases.  Issue #1028 by Santiago
+  Pastorino.
+* RubyGems now fails immediately when a git reference cannot be found instead
+  of spewing git errors.  Issue #1031 by Michal Papis
+
+=== 2.4.1 / 2014-07-17
+
+Bug fixes:
+
+* RubyGems can now be updated on Ruby implementations that do not support
+  vendordir in RbConfig::CONFIG.  Issue #974 by net1957.
+
+=== 2.4.0 / 2014-07-16
+
+Minor enhancements:
+
+* The contents command now supports a --show-install-dir option that shows
+  only the directory the gem is installed in.  Feature request #966 by Akinori
+  MUSHA.
+* Added a --build-root option to the install command for packagers.  Pull
+  request #965 by Marcus Rückert.
+* Added vendor gem support to RubyGems.  Package managers may now install gems
+  in Gem.vendor_dir with the --vendor option to gem install.  Issue #943 by
+  Marcus Rückert.
+
+Bug fixes:
+
+* Kernel#gem now respects the prerelease flag when activating gems.
+  Previously this behavior was undefined which could lead to bugs when a
+  prerelease version was unintentionally activated.  Bug #938 by Joe Ferris.
+* RubyGems now prefers gems from git over installed gems.  This allows gems
+  from git to override an installed gem with the same name and version.  Bug
+  #944 by Thomas Kriechbaumer.
+* Fixed handling of git gems in a lockfile with unversioned dependencies.  Bug
+  #940 by Michael Kaiser-Nyman.
+* The ruby directive in a gem dependencies file is ignored when installing.
+  Bug #941 by Michael Kaiser-Nyman.
+* Added open to list of builtin commands (`gem open` now works).  Reported by
+  Espen Antonsen.
+* `gem open` now works with command-line editors.  Pull request #962 by Tim
+  Pope.
+* `gem install -g` now respects `--conservative`.  Pull request #950 by Jeremy
+  Evans.
+* RubyGems releases announcements now now include checksums.  Bug #939 by
+  Alexander E. Fischer.
+* RubyGems now expands ~ in $PATH when checking if installed executables will
+  be runnable.  Pull request #945 by Alex Talker.
+* Fixed `gem install -g --explain`.  Issue #947 by Luis Lavena.  Patch by
+  Hsing-Hui Hsu.
+* RubyGems locks less during gem activation.  Pull request #951 by Aaron
+  Patterson and Justin Searls, #969 by Jeremy Tryba.
+* Kernel#gem is now thread-safe.  Pull request #967 by Aaron Patterson.
+* RubyGems now handles spaces in directory names for some parts of extension
+  building.  Pull request #949 by Tristan Hill.
+* RubyGems no longer defines an empty Date class.  Pull Request #948 by Benoit
+  Daloze.
+* RubyGems respects --document options for `gem update` again.  Bug 946 by
+  jonforums.  Patch by Hsing-Hui Hsu.
+* RubyGems generates documentation again with --ignore-dependencies.  Bug #961
+  by Pulfer.
+* RubyGems can install extensions across partitions now.  Pull request #970 by
+  Michael Scherer.
+* `-s` is now short for `--source` which resolves an ambiguity with
+  --no-suggestions.  Pull request #955 by Alexander Kahn.
+* Added extra test for ~> for 0.0.X versions.  Pull request #958 by Mark
+  Lorenz.
+* Fixed typo in gem updated help.  Pull request #952 by Per Modin.
+* Clarified that the gem description should not be excessively long.  Part of
+  bug #956 by Renier Morales.
+* Hid documentation of outdated test_files related methods in Specification.
+  Guides issue #90 by Emil Soman.
+* RubyGems now falls back to the old index if the rubygems.org API fails
+  during gem resolution.
+
+
+=== 2.3.0 / 2014-06-10
+
+Minor enhancements:
+
+* Added the `open` command which allows you to inspect the source of a gem
+  using your editor.
+  Issue #789 by Mike Perham. Pull request #804 by Vitali F.
+* The `update` command shows a summary of which gems were and were not
+  updated.  Issue #544 by Mark D. Blackwell.
+  Pull request #777 by Tejas Bubane.
+* Improved "could not find 'gem'" error reporting.  Pull request #913 by
+  Richard Schneeman.
+* Gem.use_gemdeps now accepts an argument specifying the path of the gem
+  dependencies file.  When the file is not found an ArgumentError is raised.
+* Writing a .lock file for a gem dependencies file is now controlled by the
+  --[no-]lock option.  Pull reuqest #774 by Jeremy Evans.
+* Suggestion of alternate names and spelling corrections during install can be
+  suppressed with the --no-suggestions option.  Issue #867 by Jimmy Cuadra.
+* Added mswin64 support.  Pull request #881 by U. Nakamura.
+* A gem is installable from an IO again (as in RubyGems 1.8.x and older).
+  Pull request #716 by Xavier Shay.
+* RubyGems no longer attempts to build extensions during activation.  Instead
+  a warning is issued instructing you to run `gem pristine` which will build
+  the extensions for the current platform.  Issue #796 by dunric.
+* Added Gem::UserInteraction#verbose which prints when the --verbose option is
+  given.  Pull request #811 by Aaron Patterson.
+* RubyGems can now fetch gems from private repositories using S3.  Pull
+  request #856 by Brian Palmer.
+* Added Gem::ConflictError subclass of Gem::LoadError so you can distinguish
+  conflicts from other problems.  Pull request #841 by Aaron Patterson.
+* Cleaned up unneeded load_yaml bootstrapping in Rakefile.  Pull request #815
+  by Zachary Scott.
+* Improved performance of conflict resolution.  Pull request #842 by Aaron
+  Patterson.
+* Add documentation of "~> 0" to Gem::Version.  Issue #896 by Aaron Suggs.
+* Added CONTRIBUTING file.  Pull request #849 by Mark Turner.
+* Allow use of bindir in windows_stub_script in .bat
+  Pull request #818 by @unak and @nobu
+* Use native File::PATH_SEPARATOR and remove $ before gem env on
+  Gem::Dependency#to_specs. Pull request #915 by @parkr
+* RubyGems recommends SPDX IDs for licenses now.  Pull request #917 by
+  Benjamin Fleischer.
+
+Bug fixes:
+
+* RubyGems now only fetches the latest specs to find misspellings which speeds
+  up gem suggestions.  Pull request #808 by Aaron Patterson.
+* The given .gem is installed again when multiple versions of the same gem
+  exist in the current directory.  Bug #875 by Prem Sichanugrist.
+* Local gems are preferred by name over remote gems again.  Bug #834 by
+  jonforums.
+* RubyGems can install local prerelease gems again.  Pull request #866 by
+  Aaron Patterson.  Issue #813 by André Arko.
+* RubyGems installs development dependencies correctly again.  Issue #893 by
+  Jens Wille.
+* RubyGems only installs prerelease versions when they are requested again.
+  Issue #853 by Seth Vargo, special thanks to Zachary Scott and Ben Moss.
+  Issue #884 by Nathaniel Bibler.
+* Fixed RubyGems list and search command help.  Pull request #905 and #928 by
+  Gabriel Gilder.
+* The list of gems to uninstall is always sorted now.  Bug #918 by postmodern.
+* The update command only updates exactly matching gem names now.  Bug #919 by
+  postmodern.
+* Gem::Server now supports prerelease versions.  Bug #857 by Marcelo Alvim.
+* RubyGems no longer raises an exception immediately when gems are missing
+  with RUBYGEMS_GEMDEPS.  A warning is printed instead.  Issue #886 by Michael
+  Kaiser-Nyman.
+* Commands using the rubygems.org API no longer try to sign-in when a
+  non-rubygems API key has been chosen.  Bug #826 by Ben Sedat.
+* Updated documentation of Gem::Specification#executables to indicate that
+  only ruby scripts are allowed.  Bug #830 by Geoff Nixon.
+* Gem dependency API supports multiple platforms for #platform and #platforms
+  now.  Bug #821 by johnny5-.
+* Gem dependency API supports lockfiles without explicit sources.  Bug #820 by
+  johnny5-.
+* Gem dependency API supports lockfiles with multiple sources.  Bug #822 by
+  johnny5-, bug #851 by sumit shah.
+* Gem dependency API supports lockfiles with git sources using branch, tag and
+  ref.  Bug #822 by johnny5-, #931 by Christoph Blank.
+* Gem dependency API no longer raises an exception when a gem does not exist
+  in one of the configured sources.  Bug #897 by Michael Kaiser-Nyman.
+* Gem dependency API no longer lists development dependencies in the lockfile.
+  Bug #768 by Diego Viola, #916 by Santiago Pastorino.
+* SSL configuration entries in ~/.gemrc are properly round-tripped.  Bug #837
+  by Noah Luck Easterly.
+* The environment command now shows the system configuration directory where
+  the all-users gemrc lives.  Bug #827 by Ben Langfeld.
+* Improved speed of conflict checking when activating gems.  Pull request #843
+  by Aaron Patterson.
+* Improved speed of levenshtein distance for gem suggestion misspellings.
+  Pull requests #809, #812 by Aaron Patterson.
+* Restored persistent connections.  Pull request #869 by Aaron Patterson.
+* Reduced requests when fetching gems with the bundler API.  Pull request #773
+  by Charlie Somerville.
+* Reduced dependency prefetching to improve install speed.  Pull requests
+  #871, #872 by Matthew Draper.
+* RubyGems now avoids net/http auto-proxy detection.  Issue #824 by HINOHARA
+  Hiroshi.
+* Removed conversion of Gem::List (used for debugging installs) to unless
+  necessary.  Pull request #870 by Aaron Patterson.
+* RubyGems now prints release notes from the current release.  Bug #814 by
+  André Arko.
+* RubyGems allows installation of unsigned gems again with -P MediumSecurity
+  and lower.  Bug #859 by Justin S. Collins.
+* Fixed typo in Jim Weirich's name.  Ruby pull request #577 by Mo Khan.
+* Fixed typo in Gem.datadir documentation.  Pull request #868 by Patrick
+  Jones.
+* Fixed File.exists? warnings.  Pull request #829 by SHIBATA Hiroshi.
+* Fixed show_release_notes test for LANG=C.  Issue #862 by Luis Lavena.
+* Fixed Gem::Package from IO tests on windows.  Patch from issue #861 by Luis
+  Lavena.
+* Check for nil extensions as BasicSpecification does not initialize them.
+  Pull request #882 by André Arko.
+* Fixed Gem::BasicSpecification#require_paths receives a String for
+  @require_paths. Pull requrest #904 by @danielpclark
+* Fixed circular require warnings.  Bug #908 by Zachary Scott.
+* Gem::Specification#require_paths can no longer accidentally be an Array.
+  Pull requests #904, #909 by Daniel P. Clark.
+* Don't build extensions if `build_dir/extensions` isn't writable.
+  Pull request #912 by @dunric
+* Gem::BasicSpecification#require_paths respects default_ext_dir_for now.  Bug
+  #852 by Vít Ondruch.
+
+=== 2.2.2 / 2014-02-05
+
+Bug fixes:
+
+* Fixed ruby tests when BASERUBY is not set.  Patch for #778 by Nobuyoshi
+  Nakada.
+* Removed double requests in RemoteFetcher#cache_update_path to improve remote
+  install speed.  Pull request #772 by Charlie Somerville.
+* The mkmf.log is now placed next to gem_make.out when building extensions.
+* `gem install -g --local` no longer accesses the network.  Bug #776 by Jeremy
+  Evans.
+* RubyGems now correctly handles URL passwords with encoded characters.  Pull
+  request #781 by Brian Fletcher.
+* RubyGems now correctly escapes URL characters.  Pull request #788 by Brian
+  Fletcher.
+* RubyGems can now unpack tar files where the type flag is not given.  Pull
+  request #790 by Cody Russell.
+* Typo corrections.  Pull request ruby/ruby#506 by windwiny.
+* RubyGems now uses both the default certificates and ssl_ca_cert instead of
+  one or the other.  Pull request #795 by zebardy.
+* RubyGems can now use the bundler API against hosted gem servers in a
+  directory.  Pull request #801 by Brian Fletcher.
+* RubyGems bin stubs now ignore non-versions.  This allows RubyGems bin stubs
+  to list file names like "_foo_".  Issue #799 by Postmodern.
+* Restored behavior of Gem::Version::new when subclassed.  Issue #805 by
+  Sergio Rubio.
+
+=== 2.2.1 / 2014-01-06
+
+Bug fixes:
+
+* Platforms in the Gemfile.lock GEM section are now handled correctly.  Bug
+  #767 by Diego Viola.
+* RubyGems now displays which gem couldn't be uninstalled from the home
+  directory.  Pull request #757 by Michal Papis.
+* Removed unused method Gem::Resolver#find_conflict_state.  Pull request #759
+  by Smit Shah.
+* Fixed installing gems from local files without dependencies.  Issue #760 by
+  Arash Mousavi, pull request #764 by Tim Moore.
+* Removed TODO about syntax that works in Ruby 1.8.7.  Pull request #765 by
+  Benjamin Fleischer.
+* Switched Gem.ruby_api_version to use RbConfig::CONFIG['ruby_version'] which
+  has the same value but is overridable by packagers through
+  --with-ruby-version= when configuring ruby.  Bug #770 by Jeremy Evans.
+* RubyGems now prefers the bundler API for `gem install` to reduce HTTP
+  requests.  (This change was intended for RubyGems 2.2.0 but was missed.)
+  This should address bug #762 by Dan Peterson and bug #766 by mipearson.
+* Added Gem::BasicSpecification#source_paths so documentation or analysis
+  tools can work properly as require_paths no longer returns extension source
+  directories.  Bug #758 Vít Ondruch.
+* Gem.read_binary can read read-only files again.  This caused file://
+  repositories to stop working.  Bug #761 by John Anderson.
+* Fixed specification file sorting for Ruby 1.8.7 compatibility.  Pull
+  request #763 by James Mead
+
+=== 2.2.0 / 2013-12-26
+
+Special thanks to Vít Ondruch and Michal Papis for testing and finding bugs in
+RubyGems as it was prepared for the 2.2.0 release.
+
+Major enhancements:
+
+* RubyGems can check for gem dependencies files (gem.deps.rb or Gemfile) when
+  rubygems executables are started and uses the found dependencies.  This
+  means `rake` will work similar to `bundle exec rake`.  To enable this set
+  the `RUBYGEMS_GEMDEPS` environment variable to the location of your
+  dependencies file.
+
+  See Gem::use_gemdeps for further details.
+
+* A RubyGems directory may now be shared amongst multiple ruby versions.  Upon
+  activation RubyGems will automatically compile missing extensions for the
+  current platform when the built objects are missing.  Issue #596 by Michal
+  Papis
+
+  By default different platforms do not share gem install locations so this
+  must be configured by setting GEM_HOME to a common directory.  Some gems use
+  fixed paths for requiring extensions and are not compatible with sharing gem
+  directories.
+
+  The default sharing location may be configured by RubyGems packagers through
+  Gem.default_ext_dir_for.  Pull Request #744 by Vít Ondruch.
+
+Minor enhancements:
+
+* RubyGems checks the 'allowed_push_host' metadata value when pushing a gem to
+  prevent an accidental push to a public repository (such as rubygems.org).
+  If you have private gems you should set this value in your gem specification
+  metadata.  Pull request #603 by Seamus Abshere.
+* `gem list` now shows results for multiple arguments.  Pull request #604 by
+  Zach Rabinovich.
+* `gem pristine --extensions` will restore only gems with extensions.  Issue
+  #619 by Postmodern.
+* Gem::Specification#files is now sorted.  Pull request #612 by Justin George.
+* For `gem list` and friends, "LOCAL" and "REMOTE" headers are omitted if
+  only local or remote gem information is requested with --quiet.  Pull
+  request #615 by Michal Papis.
+* Added Gem::Specification#full_require_paths which is like require_paths, but
+  returns a fully-qualified results.  Pull request #632 by Vít Ondruch.
+* RubyGems now looks for the https_proxy environment variable for https://
+  sources.  RubyGems will fall back to http_proxy if there is no https_proxy.
+  Issue #610 by mkristian.
+* RubyGems now creates directories in .gem files.  Issue #631 by marksolaris.
+* RubyGems raises an exception when a specification includes its gem.  Issue
+  #623 by notEthan.
+* RubyGems now displays relevant release note information when updating
+  RubyGems.  Issue #647 by Trevor Wennblom.
+* Deprecated Gem::Installer::ExtensionBuildError in favor of
+  Gem::Ext::BuildError.  The old constant is an alias for the new constant.
+* When extensions are built the gem_make.out file is always written now, even
+  on success.  This will help with debugging bad builds that report success.
+* If a specification fails to validate RubyGems shows a link to the
+  specification reference guide.  Issue #656 by Markus Heiler.
+* When using `gem install -g`, RubyGems now detects the presence of an
+  Isolate, Gemfile or gem.deps.rb file.
+* Added Gem::StubSpecification#stubbed? to help determine if a user should run
+  `gem pristine` to speed up gem loading.  Pull request #694 and #701 by Jon
+  Leighton.
+* RubyGems now warns when a gem has a pessimistic version dependency that may
+  be too strict.
+* RubyGems now warns when a gem has an open-ended dependency.
+* RubyGems now raises an exception when a dependency for a gem is defined
+  twice.
+* Marked the license specification attribute as recommended.  Pull request
+  #713 by Benjamin Fleischer.
+* RubyGems uses io/console instead of `stty` when available.  Pull request
+  #740 by Nobuyoshi Nakada
+* Relaxed Gem.ruby tests for platforms that override where ruby lives.  Pull
+  Request #755 by strzibny.
+
+Bug fixes:
+
+* RubyGems now returns an error status when any file given to `gem which`
+  cannot be found.  Ruby bug #9004 by Eugene Vilensky.
+* Fixed command escaping when building rake extensions.  Pull request #721 by
+  Dmitry Ratnikov.
+* Fixed uninstallation of gems when GEM_HOME is a relative directory.  Issue
+  #708 by Ryan Davis.
+* Default gems are now ignored by Gem::Validator#alien.  Issue #717 by David
+  Bahar.
+* Fixed typos in RubyGems.  Pull requests #723, #725, #731 by Akira Matsuda,
+  pull request #736 by Leo Gallucci, pull request #746 by DV Suresh.
+* RubyGems now holds exclusive locks on cached gem files to prevent incorrect
+  updates.  Pull Request #737 by Smit Shah
+* Improved speed of `gem install --ignore-dependencies`.  Patch by Terence
+  Lee.
+
+=== 2.1.11 / 2013-11-12
+
+Bug fixes:
+
+* Gem::Specification::remove_spec no longer checks for existence of the spec
+  to be removed.  Issue #698 by Tiago Macedo.
+* Restored wildcard handling when installing gems.  Issue #697 by Chuck Remes.
+* Added DigiCert High Assurance EV Root CA certificate for the cloudfront.net
+  certificate change.
+* The Gem::RemoteFetcher tests now choose the test server port more reliably.
+  Pull Request #706 by akr.
+
+=== 2.1.10 / 2013-10-24
+
+Bug fixes:
+
+* Use class check instead of :version method check when creating Gem::Version
+  objects.  Fixes #674 by jkanywhere.
+* Fail during `gem update` when an error occurs checking for newer versions.
+  This means RubyGems no longer reports "nothing to update" when it cannot
+  communicate with the server.  Issue #688 by Jimmy Dee.
+* Allow installation of gems when the home directory does not exist.  Issue
+  #689 by Laurence Rowe
+* Fix updating gems which have multiple platforms.  Issue #693 by Ookami
+  Kenrou.
+* The gem server now uses user-provided directories.  Issue #696 by Marcelo
+  Alvim.
+* Improved resolution of gems when specific versions have conflicting
+  dependencies.
+* RubyGems installs local gems regardless of platform again.  Issue #695
+* The --ignore-dependencies option for gem installation works again.  Issue
+  #695
+
+=== 2.1.9 / 2013-10-14
+
+Bug fixes:
+
+* Reduce sorting when fetching specifications.  This speeds up the update and
+  outdated commands, and others.  Issue #657 by windwiny.
+* Proxy usernames and passwords are now escaped properly.  Ruby Bug #8979 by
+  Masahiro Tomita, Issue #668 by Kouhei Sutou.
+
+=== 2.1.8 / 2013-10-10
+
+Bug fixes:
+
+* Fixed local installation of platform gem files.  Issue #664 by Ryan Melton.
+* Files starting with "." in the root directory are installed again.  Issue
+  #680 by Ivo Wever, Pull Request #681 by Jeremy Evans.
+* The index generator no longer indexes default gems.  Issue #661 by
+  Jeremy Hinegardner.
+
+=== 2.1.7 / 2013-10-09
+
+Bug fixes:
+
+* `gem sources --list` now displays a list of sources.  Pull request #672 by
+  Nathan Marley.
+* RubyGems no longer alters Gem::Specification.dirs when installing.  Pull
+  Request #670 by Vít Ondruch
+* Use RFC 2616-compatible time in HTTP headers.  Pull request #655 by Larry
+  Marburger.
+* RubyGems now gives a more descriptive message for missing licenses on
+  validation.  Issue #656 by Markus Heiler.
+* Expand unpack destination directory.  This fixes problems when File.realpath
+  is missing and $GEM_HOME contains "..".  Issue #679 by Charles Nutter.
+
+=== 2.1.6 / 2013-10-08
+
+Bug fixes:
+
+* Added certificates to follow the s3.amazonaws.com certificate change.  Fixes
+  #665 by emeyekayee.  Fixes #671 by jonforums.
+* Remove redundant built-in certificates not needed for https://rubygems.org
+  Fixes #654 by Vít Ondruch.
+* Added test for missing certificates for https://s3.amazonaws.com or
+  https://rubygems.org.  Pull request #673 by Hannes Georg.
+* RubyGems now allows a Pathname for Kernel#require like the built-in
+  Kernel#require.  Pull request #663 by Aaron Patterson.
+* Required rbconfig in Gem::ConfigFile for Ruby 1.9.1 compatibility.  (Ruby
+  1.9.1 is no longer receiving security fixes, so please update to a newer
+  version.)  Issue #676 by Michal Papis.  Issue wayneeseguin/rvm#2262 by
+  Thomas Sänger.
+
+=== 2.1.5 / 2013-09-24
+
+Security fixes:
+
+* RubyGems 2.1.4 and earlier are vulnerable to excessive CPU usage due to a
+  backtracking in Gem::Version validation.  See CVE-2013-4363 for full details
+  including vulnerable APIs.  Fixed versions include 2.1.5, 2.0.10, 1.8.27 and
+  1.8.23.2 (for Ruby 1.9.3).
+
+=== 2.1.4 / 2013-09-17
+
+Bug fixes:
+
+* `gem uninstall foo --all` now force-uninstalls all versions of foo.  Issue
+  #650 by Kyle (remkade).
+* Fixed uninstalling gems installed in the home directory (as in
+  `--user-install`).  Issue #653 by Lin Jen-Shin.
+
+=== 2.1.3 / 2013-09-12
+
+Bug fixes:
+
+* Gems with files entries starting with "./" no longer install 0 files.  Issue
+  #644 by Darragh Curran, #645 by Brandon Turner, #646 by Alex Tambellini
+
+=== 2.1.2 / 2013-09-11
+
+Bug fixes:
+
+* Restore concurrent requires following the fix for ruby bug #8374.  Pull
+  request #637 and issue #640 by Charles Nutter.
+* Gems with extensions are now installed correctly when the --install-dir
+  option is used.  Issue #642 by Lin Jen-Shin.
+* Gem fetch now fetches the newest (not oldest) gem when --version is given.
+  Issue #643 by Brian Shirai.
+
+=== 2.1.1 / 2013-09-10
+
+Bug fixes:
+
+* Only matching gems matching your local platform are considered for
+  installation.  Issue #638 by José M. Prieto, issue #639 by sawanoboly.
+
+=== 2.1.0 / 2013-09-09
+
+Security fixes:
+
+* RubyGems 2.0.7 and earlier are vulnerable to excessive CPU usage due to a
+  backtracking in Gem::Version validation.  See CVE-2013-4287 for full details
+  including vulnerable APIs.  Fixed versions include 2.0.8, 1.8.26 and
+  1.8.23.1 (for Ruby 1.9.3).  Issue #626 by Damir Sharipov.
+
+Major enhancements:
+
+* RubyGems uses a new dependency resolver for gem installation which works
+  similar to the bundler resolver.  The new resolver can resolve conflicts the
+  previous resolver could not and offers improved diagnostics when conflicts
+  are discovered.
+
+Minor enhancements:
+
+* RubyGems now has improved platform matching for the ARM architecture.  Gems
+  built with a CPU of "arm" will match any specific ARM CPU.  See `gem help
+  platform` for further details.  Fixes #532 by Kim Burgestrand.
+* The --version option now accepts compound requirements the same as in a gem
+  dependency.  The following invocation will install rails between 4.0.0.beta
+  and 4.2:
+
+    gem install rails -v '>= 4.0.0.beta, < 4.2'
+
+  Fixes #531 by Gary S. Weaver
+* `gem clean` now allows `-n` as an alias for `--dryrun`.  Pull Request #517
+  by Gastón Ramos
+* Added `gem update --system` to `gem help`.  Pull Request #514 by Vince
+  Wadhwani
+* Added PATH to `gem env` output.  Pull Request #490 by Michal Papis
+* Added --host option to `gem owner` to match other commands using the
+  gemcutter API.  Pull Request #462 and issue #461 by Hugo Lopes Tavares
+* Added --abort-on-dependent to `gem uninstall`.  This will abort instead of
+  asking to uninstall a gem that is depended upon by another gem.  Pull
+  request #549 by Philip Arndt.
+* RubyGems no longer alters Gem::Specification.dirs when installing.  Based on
+  Pull Request #452 by Vít Ondruch
+* RubyGems uses ENV['MAKE'] or ENV['make'] over rbconfig.rb's make if present.
+  Pull Request #443 by Erik Hollensbe
+* RubyGems can now save remote source cache files in an alternate directory
+  controlled by `ENV["GEM_SPEC_CACHE"]`.  Pull Request #489 by Michal Papis
+* Generated private keys are now encrypted.  Pull Request #453 by pietro
+* Separated Gem::Request from Gem::RemoteFetcher.  Pull Request #283 by Steve
+  Klabnik.
+* RubyGems indicates when a .gem's content is corrupt while verifying.  Bug
+  #519 by William T Nelson.
+* Refactored common installer setup.  Pull request #520 by Gastón Ramos
+* Moved activation tests to Gem::Specification.  Pull request #521 by Gastón
+  Ramos
+* When a --version option with a prerelease version is given RubyGems
+  automatically enables prerelease versions but only the last version is
+  used.  If the first version is a prerelease version this is no longer sticky
+  unless an explicit --[no-]prerelease was also given.  Fixes part of #531.
+* RubyGems now supports an SSL client certificate.  Pull request #550 by
+  Robert Kenny.
+* RubyGems now suggests how to fix permission errors.  Pull request #553 by
+  Odin Dutton.
+* Added support for installing a gem as default gems for alternate ruby
+  implementations.  Pull request #566 by Charles Nutter.
+* Improved performance of Gem::Specification#load by caching the loaded
+  gemspec.  Pull request #569 by Charlie Somerville.
+* RubyGems now warns when an unsigned gem is verified if -P was given during
+  installation even if the security policy allows unsigned gems and warns when
+  an untrusted certificate is seen even if the security policy allows
+  untrusted certificates.  Issue #474 by Grant Olson
+* RubyGems can now rewrite executables with or without a shebang of
+  /usr/bin/env via <code>gem pristine --all --only-executables
+  --env-[no-]shebang</code>.  Issue #579 by Paul Annesley.
+* RubyGems can now run its tests without OpenSSL.  Ruby Bug #8557 by nobu.
+* Improved performance by caching Gem::Version objects and avoiding
+  method_missing in Gem::Specification.  Pull request #447 by Jon Leighton.
+* Files in a .gem now preserve their modification times.  Pull request #582 by
+  Jesse Bowes
+* Improved speed of looking up dependencies in SpecFetcher through
+  Array#bsearch (when present).  Pull request #595 by Andras Suller
+* Added `--all` option to `gem uninstall` which removes all gems in GEM_HOME.
+  Pull request #584 by Shannon Skipper.
+* Added Gem.find_latest_files which is equivalent to Gem.find_files but only
+  returns matching files from the latest version of each gem.  Issue #186 by
+  Ryan Davis.
+* Improved performance of `gem outdated` by reducing duplicate work (it is
+  still slow, but I see a near 50% improvement for 250 gems on a fast
+  connection).  See also Gem::Specification::outdated_and_latest_version
+
+Bug fixes:
+
+* rubygems_plugin.rb files are now only loaded from the latest installed gem.
+* Fixed Gem.clear_paths when Security is defined at top-level.  Pull request
+  #625 by elarkin
+* Fixed credential creation for `gem push` when `--host` is not given.  Pull
+  request #622 by Arthur Nogueira Neves
+
+=== 2.0.14 / 2013-11-12
+
+Bug fixes:
+
+* Gem::Specification::remove_spec no longer checks for existence of the spec
+  to be removed.  Issue #698 by Tiago Macedo.
+* Restored wildcard handling when installing gems.  Issue #697 by Chuck Remes.
+* Added DigiCert High Assurance EV Root CA certificate for the cloudfront.net
+  certificate change.
+* The Gem::RemoteFetcher tests now choose the test server port more reliably.
+  Pull Request #706 by akr.
+
+=== 2.0.13 / 2013-10-24
+
+Bug fixes:
+
+* Use class check instead of :version method check when creating Gem::Version
+  objects.  Fixes #674 by jkanywhere.
+* Allow installation of gems when the home directory does not exist.  Issue
+  #689 by Laurence Rowe
+* Fix updating gems which have multiple platforms.  Issue #693 by Ookami
+  Kenrou.
+
+=== 2.0.12 / 2013-10-14
+
+Bug fixes:
+
+* Proxy usernames and passwords are now escaped properly.  Ruby Bug #8979 by
+  Masahiro Tomita, Issue #668 by Kouhei Sutou.
+
+=== 2.0.11 / 2013-10-08
+
+Bug fixes:
+
+* Added certificates to follow the s3.amazonaws.com certificate change.  Fixes
+  #665 by emeyekayee.  Fixes #671 by jonforums.
+* Remove redundant built-in certificates not needed for https://rubygems.org
+  Fixes #654 by Vít Ondruch.
+* Added test for missing certificates for https://s3.amazonaws.com or
+  https://rubygems.org.  Pull request #673 by Hannes Georg.
+* RubyGems now allows a Pathname for Kernel#require like the built-in
+  Kernel#require.  Pull request #663 by Aaron Patterson.
+* Required rbconfig in Gem::ConfigFile for Ruby 1.9.1 compatibility.  (Ruby
+  1.9.1 is no longer receiving security fixes, so please update to a newer
+  version.)  Issue #676 by Michal Papis.  Issue wayneeseguin/rvm#2262 by
+  Thomas Sänger.
+
+=== 2.0.10 / 2013-09-24
+
+Security fixes:
+
+* RubyGems 2.1.4 and earlier are vulnerable to excessive CPU usage due to a
+  backtracking in Gem::Version validation.  See CVE-2013-4363 for full details
+  including vulnerable APIs.  Fixed versions include 2.1.5, 2.0.10, 1.8.27 and
+  1.8.23.2 (for Ruby 1.9.3).
+
+=== 2.0.9 / 2013-09-13
+
+Bug fixes:
+
+* Gem fetch now fetches the newest (not oldest) gem when --version is given.
+  Issue #643 by Brian Shirai.
+* Fixed credential creation for `gem push` when `--host` is not given.  Pull
+  request #622 by Arthur Nogueira Neves
+
+=== 2.0.8 / 2013-09-09
+
+Security fixes:
+
+* RubyGems 2.0.7 and earlier are vulnerable to excessive CPU usage due to a
+  backtracking in Gem::Version validation.  See CVE-2013-4287 for full details
+  including vulnerable APIs.  Fixed versions include 2.0.8, 1.8.26 and
+  1.8.23.1 (for Ruby 1.9.3).  Issue #626 by Damir Sharipov.
+
+Bug fixes:
+
+* Fixed Gem.clear_paths when Security is defined at top-level.  Pull request
+  #625 by elarkin
+
+=== 2.0.7 / 2013-08-15
+
+Bug fixes:
+
+* Extensions may now be built in parallel (therefore gems may be installed in
+  parallel).  Bug #607 by Hemant Kumar.
+* Changed broken link to RubyGems Bookshelf to point to RubyGems guides.  Ruby
+  pull request #369 by 謝致邦.
+* Fixed various test failures due to platform differences or poor tests.
+  Patches by Yui Naruse and Koichi Sasada.
+* Fixed documentation for Kernel#require.
+
+=== 2.0.6 / 2013-07-24
+
+Bug fixes:
+
+* Fixed the `--no-install` and `-I` options to `gem list` and friends.  Bug
+  #593 by Blargel.
+* Fixed crash when installing gems with extensions under the `-V` flag.  Bug
+  #601 by Nick Hoffman.
+* Fixed race condition retrieving HTTP connections in Gem::Request on JRuby.
+  Bug #597 by Hemant Kumar.
+* Fixed building extensions on ruby 1.9.3 under mingw.  Bug #594 by jonforums,
+  Bug #599 by Chris Riesbeck
+* Restored default of remote search to `gem search`.
+
+=== 2.0.5 / 2013-07-11
+
+* Fixed building of extensions that run ruby in their makefiles.  Bug #589 by
+  Zachary Salzbank.
+
+=== 2.0.4 / 2013-07-09
+
+Bug fixes:
+
+* Fixed error caused by gem install not finding the right platform for your
+  platform. Bug #576 by John Anderson
+* Fixed pushing gems with the default host.  Bug #495 by Utkarsh Kukreti
+* Improved unhelpful error message from `gem owner --remove`.  Bug #488 by
+  Steve Klabnik
+* Fixed typo in `gem spec` help.  Pull request #563 by oooooooo
+* Fixed creation of build_info with --install-dir.  Bug #457 by Vít Ondruch.
+* RubyGems converts non-string dependency names to strings now.  Bug #505 by
+  Terence Lee
+* Outdated prerelease versions are now listed in `gem outdated`.
+* RubyGems now only calls fsync() on the specification when installing, not
+  every file from the gem.  This improves the performance of gem installation
+  on some systems.  Pull Request #556 by Grzesiek Kolodziejczyk
+* Removed surprise search term anchoring in `gem search` to restore 1.8-like
+  search behavior while still defaulting to --remote.  Pull request #562 by
+  Ben Bleything
+* Fixed handling of DESTDIR when building extensions.  Pull request #573 by
+  Akinori MUSHA
+* Fixed documentation of `gem pristine` defaults (--all is not a default).
+  Pull request #577 by Shannon Skipper
+* Fixed a windows extension-building test failure.  Pull request #575 by
+  Hiroshi Shirosaki
+* Fixed issue with `gem update` where it would attempt to use a Version
+  instead of a Requirement to find the latest gem.  Fixes #570 by Nick Cox.
+* RubyGems now ignores an empty but set RUBYGEMS_HOST environment variable.
+  Based on pull request #558 by Robin Dupret.
+* Removed duplicate creation of gem subdirectories in
+  Gem::DependencyInstaller.  Pull Request #456 by Vít Ondruch
+* RubyGems now works with Ruby built with `--with-ruby-version=''`.  Pull
+  Request #455 by Vít Ondruch
+* Fixed race condition when two threads require the same gem.  Ruby bug report
+  #8374 by Joel VanderWerf
+* Cleaned up siteconf between extension build and extension install.  Pull
+  request #587 by Dominic Cleal
+* Fix deprecation warnings when converting gemspecs to yaml.  Ruby commit
+  r41148 by Yui Naruse
+
+=== 2.0.3 / 2013-03-11
+
+* Bug fixes:
+  * Reverted automatic upgrade to HTTPS as it breaks RubyGems APIs.  Fixes
+    #506 by André Arko
+  * Use File.realpath to remove extra / while checking if files are
+    installable.  Issue #508 by Jacob Evans.
+  * When installing RubyGems on JRuby, the standard library is no longer
+    deleted.  Fixes #504 by Juan Sanchez, #507 by Charles Oliver Nutter.
+  * When building extconf.rb extensions use the intermediate destination
+    directory.  This addresses further issues with C extension building.
+  * Use the absolute path to the generated siteconf in case the extension
+    changes directories to run extconf.rb (like memcached).  Fixes #498 by
+    Chris Morris.
+  * Fixed default gem key and cert locations.  Pull request #511 by Samuel
+    Cochran.
+
+=== 2.0.2 / 2013-03-06
+
+* Bug fixes:
+  * HTTPS URLs are preferred over HTTP URLs.  RubyGems will now attempt to
+    upgrade any HTTP source to HTTPS.  Credit to Alex Gaynor.
+  * SSL Certificates are now installed properly.  Fixes #491 by hemanth.hm
+  * Fixed HTTP to HTTPS upgrade for rubygems.org.
+
+=== 2.0.1 / 2013-03-05
+
+* Bug fixes:
+  * Lazily load RubyGems.org API credentials to avoid failure during
+    RubyGems installation.  Bug #465 by Isaac Sanders.
+  * RubyGems now picks the latest prerelease to install.  Fixes bug #468 by
+    Santiago Pastorino.
+  * Improved detection of missing Zlib::GzipReader encoding support.  Works
+    around JRuby-only bug #472 by Matt Beedle.
+  * "Done installing documentation" is no longer displayed when documentation
+    generation is disabled.  Fixes bug #469 by Jeff Sandberg
+  * The existing executable check now respects --format-executable.  Pull
+    request #471 by Jeremy Evans.
+  * RubyGems no longer creates gem subdirectories when fetching gems.  Fixes
+    #482 by Loren Segal.
+  * RubyGems does not require OpenSSL like RubyGems 1.8, but still prefers it.
+    Fixes #481 by André Arko.
+  * RubyGems only fetches specs for list, search and query commands when
+    needed like RubyGems 1.x.  Fixes bug #487 by bitbuerster, Ruby bug #8019
+    by Ike Miller.
+  * Allow specification of mode for gem subdirectory creation.
+    Ruby bug #7713 by nobu
+  * Fix tests when an 'a.rb' exists.  Ruby bug #7749 by nobu.
+
+=== 2.0.0 / 2013-02-24
+
+RubyGems 2.0 includes several new features and many breaking changes.  Some of
+these changes will cause existing software to break.  These changes are a
+result of improvements to the internals of RubyGems that make it more
+maintainable and improve APIs for RubyGems users.
+
+If you are using bundler be sure to install a 1.3.0.prerelease version or
+newer.  Older versions of bundler will not work with RubyGems 2.0.
+
+Changes since RubyGems 1.8.25 (including past pre-releases):
+
+* Breaking changes:
+
+  * Deprecated Gem.unresolved_deps in favor of
+    Gem::Specification.unresolved_deps
+  * Merged Gem::Builder into Gem::Package.  Use Gem::Package.build(spec)
+    instead of Gem::Builder.new(spec).build
+  * Merged Gem::Format into Gem::Package.  Use Gem::Package.new instead
+    of Gem::Format.from_file_by_path
+  * Moved Gem::OldFormat to Gem::Package::Old.  Gem::Package will
+    automatically detect old gems for you, so there is no need to refer to it.
+  * Removed Gem::DocManager, replaced by Gem::RDoc and done_installing hook
+  * Removed Gem::Package::TarInput in favor of Gem::Package
+  * Removed Gem::Package::TarOutput in favor of Gem::Package
+  * Removed Gem::RemoteFetcher#open_uri_or_path. (steveklabnik)
+  * Removed Gem::SSL in favor of using OpenSSL directly
+  * Removed Gem.loaded_path
+  * Removed RSS generation from the gem indexer
+  * Removed benchmark option from .gemrc
+  * Removed broken YAML gemspec support in `gem build`
+  * Removed support for Ruby 1.9.1
+  * Removed many deprecated methods
+
+* Major enhancements:
+
+  * Improved support for default gems shipping with ruby 2.0.0+
+  * A gem can have arbitrary metadata through Gem::Specification#metadata
+  * `gem search` now defaults to --remote and is anchored like gem list.  Fixes
+    #166
+  * Added --document to replace --rdoc and --ri.  Use --no-document to disable
+    documentation, --document=rdoc to only generate rdoc.
+  * Only ri-format documentation is generated by default.
+  * `gem server` uses RDoc::Servlet from RDoc 4.0 to generate HTML
+    documentation.
+  * Add ability to install gems directly from a compatible gemdep
+    file (Gemfile, Isolate, gem.deps.rb)
+    <code>gem install --file path</code>
+  * Add ability to load gem activation information from a gemdeps
+    file (Gemfile, Isolate, gem.deps.rb).
+    Set RUBYGEMS_GEMDEPS=path to have it loaded. Use - as the path
+    to autodetect (current and parent directories are searched).
+
+* Minor enhancements:
+  * Added `gem check --doctor` to clean up after failed uninstallation.  Bug
+    #419 by Erik Hollensbe
+  * RubyGems no longer defaults to uninstalling gems if a dependency would be
+    broken.  Now you must manually say "yes".  Pull Request #406 by Shannon
+    Skipper.
+  * Gem::DependencyInstaller now passes build_args down to the installer.
+    Pull Request #412 by Sam Rawlins.
+  * Added a cmake builder.  Pull request #265 by Allan Espinosa.
+  * Removed rubyforge page from gem list output
+  * Added --only-executables option to `gem pristine`.  Fixes #326
+  * Added -I flag for 'gem query' to exclude installed items
+  * Added Gem.install(name, version=default) for interactive sessions
+  * Added Gem::FilePermissionError#directory
+  * Added Gem::rubygems_version which is like Gem::ruby_version
+  * Added RUBYGEMS_HOST documentation to `gem env`
+  * Added a post_installs hook that runs after Gem::DependencyInstaller
+    finishes installing a set of gems
+  * Added a usage method for Gem::Commands::OwnerCommand. (ffmike)
+  * Added an optional type parameter to Gem::Specification#doc_dir.
+  * Added announcements url and clarified how to file tickets
+  * Added guidance for how to use rdoc and ri in setup command. (jjb)
+  * Attempting to install multiple gems with --version is now an error.  You
+    can specify per-gem versions like <code>rake:0.9.5</code>
+  * Clarified Gem::CommandManager example code to avoid multi load problems.
+    (baroquebobcat)
+  * Corrupt or bad cached specs are now re-downloaded. (cookrn)
+  * Extension build arguments are saved from install and reused for pristine
+  * If the OS allows it, documentation is built in a forked background
+    process. (alexch)
+  * Imported gem yank from the gemcutter gem.  Fixes #177, #343
+  * Packaged gems now contain and verify SHA1 checksums
+  * Removed commas from gem update summary so you can paste it back to
+    cleanup.  (amatsuda)
+  * RubyGems will now warn when building gems with prerelease dependencies.
+    Fixes #255
+  * The RUBYGEMS_HOST environment variable is used to determine appropriate
+    API key for pushing or yanking gems
+  * Uninstall is now performed in reverse topological order.
+  * Users are told what to type when they try to uninstall a gem outside
+    GEM_HOME
+  * When building gems with non-world-readable files a warning is shown.
+
+* Bug fixes:
+  * Gem.refresh now maintains the active gem list.  Clearing the list would
+    cause double-loads which would cause other bugs.  Pull Request #427 by
+    Jeremy Evans
+  * RubyGems now refuses to read the gem push credentials file if it has
+    insecure permissions.  Pull Request #438 by Shannon Skipper
+  * RubyGems now requires a local gem name to end in '.gem'.  Issue #407 by
+    Santiago Pastorino.
+  * Do not allow old-format gems to be installed with a security policy that
+    verifies data.
+  * Gem installation will fail if RubyGems cannot load the specification from
+    the gem.  Bug #419 by Erik Hollensbe
+  * RubyGems tests now run in FIPS mode.  Issue #365 by Vít Ondruch
+  * Only update the spec cache when we have permission.  Ruby Bug #7509
+  * gem install now ignores directories and non .gem files that match the gem
+    to install.  Bug #407 by Santiago Pastorino.
+  * Added PID to setup bin_file while installing RubyGems to protect against
+    errors. Fixes #328 by ConradIrwin
+  * Added missing require in Gem::Uninstaller when format_executable is set.
+    (sakuro)
+  * Exact gem command name matches are now chosen even if a longer command
+    overlaps the exact name
+  * Fixed Gem.loaded_path? with a Pathname instance. (mattetti)
+  * Fixed Gem::Dependency.new mismatch with rubygems.org checks
+  * Fixed SecurityError in Gem::Specification.load when $SAFE=1. (ged)
+  * Fixed SystemStackError with "gem list -r -a" on 1.9 (cldwalker)
+  * Fixed `gem owners` command so that exceptions don't stop the rest of the
+    command from completing
+  * Fixed `gem unpack uninstalled_gem` default version picker.
+  * Fixed defunct rubyforge urls in gem command line help
+  * Fixed documentation for the various hooks collections
+  * Fixed documentation generation on setup when the gem directory does not
+    exist.  Fixes #253
+  * Fixed documentation to reflect where defaults overrides are loaded from.
+    (ferrous26)
+  * Fixed editing of a Makefile with 8-bit characters.  Fixes #181
+  * Fixed gem loading issue caused by dependencies not resolving.
+  * Fixed independent testing of test_gem_package_tar_output.  Ruby Bug #4686
+    by Shota Fukumori
+  * Fixed typo in uninstall message. (sandal)
+  * Gem::Requirement#<=> returns nil on non-requirement arg.
+  * Gem::Requirement.satisfied_by? raises ArgumentError if given a non-version
+    argument
+  * Gem::Version#initialize no longer modifies its parameter. (miaout17)
+  * Group-writable permissions are now allowed for gem repositories. (ctcherry)
+  * Memoized values in Gem::Specification are now reset the version or
+    platform changes. Fixes #78
+  * More specific errors are raised for bad requirements. (arsduo)
+  * Removed reference to 'sources' gem in documentation
+  * Removed unused block arguments to avoid creating Proc objects. (k-tsj)
+  * RubyGems now asks before overwriting executable wrappers.  Ruby Bug #1800
+  * The bindir is now created with mkdir_p during install. (voxik)
+  * URI scheme matching is no longer case-sensitive.  Fixes #322
+  * ext/builder now checks $MAKE as well as $make (okkez)
+
+Changes since RubyGems 2.0.0.rc.2:
+
+* Bug fixes:
+  * Gem.gzip and Gem.gunzip now return strings with BINARY encoding.  Issue
+    #450 by Jeremy Kemper
+  * Fixed placement of executables with --user-install.  Ruby bug #7779 by Jon
+    Forums.
+  * Fixed `gem update` with --user-install.  Ruby bug #7779 by Jon Forums.
+  * Fixed test_initialize_user_install for windows.  Ruby bug #7885 by Luis
+    Lavena.
+  * Create extension destination directory before building extensions.  Ruby
+    Bug #7897 and patch by Kenta Murata.
+  * Fixed verification of gems at LowSecurity due to missing signature.
+    Thanks to André Arko.
+
+=== 2.0.0.rc.2 / 2013-02-08
+
+* Bug fixes:
+  * Fixed signature verification of gems which was broken only on master.
+    Thanks to Brian Buchanan.
+  * Proper exceptions are raised when verifying an unsigned gem.  Thanks to
+    André Arko.
+
+=== 2.0.0.rc.1 / 2013-01-08
+
+* Minor enhancements:
+  * This release of RubyGems can push gems to rubygems.org.  Ordinarily
+    prerelease versions of RubyGems cannot push gems.
+  * Added `gem check --doctor` to clean up after failed uninstallation.  Bug
+    #419 by Erik Hollensbe
+
+* Bug fixes:
+  * Fixed exception raised when attempting to push gems to rubygems.org.  Bug
+    #418 by André Arko
+  * Gem installation will fail if RubyGems cannot load the specification from
+    the gem.  Bug #419 by Erik Hollensbe
+
+=== 2.0.0.preview2.2 / 2012-12-14
+
+* Minor enhancements:
+  * Added a cmake builder.  Pull request #265 by Allan Espinosa.
+  * Removed rubyforge page from gem list output
+
+* Bug fixes:
+  * Restored RubyGems 1.8 packaging behavior of omitting directories.  Bug
+    #413 by Jeremy Kemper.
+
+=== 2.0.0.preview2.1 / 2012-12-08
+
+* Minor enhancements:
+  * Gem::DependencyInstaller now passes build_args down to the installer.
+    Pull Request #412 by Sam Rawlins.
+  * RubyGems no longer defaults to uninstalling gems if a dependency would be
+    broken.  Now you must manually say "yes".  Pull Request #406 by Shannon
+    Skipper.
+
+* Bug fixes:
+  * RubyGems tests now run in FIPS mode.  Issue #365 by Vít Ondruch
+  * Fixed Gem::Specification#base_dir for default gems.  Ruby Bug #7469
+  * Only update the spec cache when we have permission.  Ruby Bug #7509
+  * Restored order of version marking.  Fixes an issue with bundler.  Thanks
+    to Aaron Patterson and Terence Lee.
+  * Gem cleanup now skips default gems.  Pull Request #409 by Kouhei Sutou
+  * gem list, search and query can show remote gems again.  Bug #410 by
+    Henry Maddocks
+  * gem install now ignores directories that match the gem to install.  Bug
+    #407 by Santiago Pastorino.
+
+=== 2.0.0.preview2 / 2012-12-01
+
+This release contains two commits not present in Ruby 2.0.0.preview2.  One
+commit is for ruby 1.8.7 support, the second allows RubyGems to work under
+$SAFE=1.  There is no functional difference compared to Ruby 2.0.0.preview2
+
+* Breaking changes:
+
+  * Deprecated Gem.unresolved_deps in favor of
+    Gem::Specification.unresolved_deps
+  * Merged Gem::Builder into Gem::Package.  Use Gem::Package.build(spec)
+    instead of Gem::Builder.new(spec).build
+  * Merged Gem::Format into Gem::Package.  Use Gem::Package.new instead
+    of Gem::Format.from_file_by_path
+  * Moved Gem::OldFormat to Gem::Package::Old.  Gem::Package will
+    automatically detect old gems for you, so there is no need to refer to it.
+  * Removed Gem::DocManager, replaced by Gem::RDoc and done_installing hook
+  * Removed Gem::Package::TarInput in favor of Gem::Package
+  * Removed Gem::Package::TarOutput in favor of Gem::Package
+  * Removed Gem::RemoteFetcher#open_uri_or_path. (steveklabnik)
+  * Removed Gem::SSL in favor of using OpenSSL directly
+  * Removed Gem.loaded_path
+  * Removed RSS generation from the gem indexer
+  * Removed benchmark option from .gemrc
+  * Removed broken YAML gemspec support in `gem build`
+  * Removed support for Ruby 1.9.1
+  * Removed many deprecated methods
+
+* Major enhancements:
+
+  * Improved support for default gems shipping with ruby 2.0.0+
+  * A gem can have arbitrary metadata through Gem::Specification#metadata
+  * `gem search` now defaults to --remote and is anchored like gem list.  Fixes
+    #166
+  * Added --document to replace --rdoc and --ri.  Use --no-document to disable
+    documentation, --document=rdoc to only generate rdoc.
+  * Only ri-format documentation is generated by default.
+  * `gem server` uses RDoc::Servlet from RDoc 4.0 to generate HTML
+    documentation.
+  * Add ability to install gems directly from a compatible gemdep
+    file (Gemfile, Isolate, gem.deps.rb)
+    <code>gem install --file path</code>
+  * Add ability to load gem activation information from a gemdeps
+    file (Gemfile, Isolate, gem.deps.rb).
+    Set RUBYGEMS_GEMDEPS=path to have it loaded. Use - as the path
+    to autodetect (current and parent directories are searched).
+
+* Minor enhancements:
+
+  * Added --only-executables option to `gem pristine`.  Fixes #326
+  * Added -I flag for 'gem query' to exclude installed items
+  * Added Gem.install(name, version=default) for interactive sessions
+  * Added Gem::FilePermissionError#directory
+  * Added Gem::rubygems_version which is like Gem::ruby_version
+  * Added RUBYGEMS_HOST documentation to `gem env`
+  * Added a post_installs hook that runs after Gem::DependencyInstaller
+    finishes installing a set of gems
+  * Added a usage method for Gem::Commands::OwnerCommand. (ffmike)
+  * Added an optional type parameter to Gem::Specification#doc_dir.
+  * Added announcements url and clarified how to file tickets
+  * Added guidance for how to use rdoc and ri in setup command. (jjb)
+  * Attempting to install multiple gems with --version is now an error.  You
+    can specify per-gem versions like <code>rake:0.9.5</code>
+  * Clarified Gem::CommandManager example code to avoid multi load problems.
+    (baroquebobcat)
+  * Corrupt or bad cached specs are now re-downloaded. (cookrn)
+  * Extension build arguments are saved from install and reused for pristine
+  * If the OS allows it, documentation is built in a forked background
+    process. (alexch)
+  * Imported gem yank from the gemcutter gem.  Fixes #177, #343
+  * Packaged gems now contain and verify SHA1 checksums
+  * Removed commas from gem update summary so you can paste it back to
+    cleanup.  (amatsuda)
+  * RubyGems will now warn when building gems with prerelease dependencies.
+    Fixes #255
+  * The RUBYGEMS_HOST environment variable is used to determine appropriate
+    API key for pushing or yanking gems
+  * Uninstall is now performed in reverse topological order.
+  * Users are told what to type when they try to uninstall a gem outside
+    GEM_HOME
+  * When building gems with non-world-readable files a warning is shown.
+
+* Bug fixes:
+
+  * Added PID to setup bin_file while installing RubyGems to protect against
+    errors. Fixes #328 by ConradIrwin
+  * Added missing require in Gem::Uninstaller when format_executable is set.
+    (sakuro)
+  * Exact gem command name matches are now chosen even if a longer command
+    overlaps the exact name
+  * Fixed Gem.loaded_path? with a Pathname instance. (mattetti)
+  * Fixed Gem::Dependency.new mismatch with rubygems.org checks
+  * Fixed SecurityError in Gem::Specification.load when $SAFE=1. (ged)
+  * Fixed SystemStackError with "gem list -r -a" on 1.9 (cldwalker)
+  * Fixed `gem owners` command so that exceptions don't stop the rest of the
+    command from completing
+  * Fixed `gem unpack uninstalled_gem` default version picker.
+  * Fixed defunct rubyforge urls in gem command line help
+  * Fixed documentation for the various hooks collections
+  * Fixed documentation generation on setup when the gem directory does not
+    exist.  Fixes #253
+  * Fixed documentation to reflect where defaults overrides are loaded from.
+    (ferrous26)
+  * Fixed editing of a Makefile with 8-bit characters.  Fixes #181
+  * Fixed gem loading issue caused by dependencies not resolving.
+  * Fixed independent testing of test_gem_package_tar_output.  Ruby Bug #4686
+    by Shota Fukumori
+  * Fixed typo in uninstall message. (sandal)
+  * Gem::Requirement#<=> returns nil on non-requirement arg.
+  * Gem::Requirement.satisfied_by? raises ArgumentError if given a non-version
+    argument
+  * Gem::Version#initialize no longer modifies its parameter. (miaout17)
+  * Group-writable permissions are now allowed for gem repositories. (ctcherry)
+  * Memoized values in Gem::Specification are now reset the version or
+    platform changes. Fixes #78
+  * More specific errors are raised for bad requirements. (arsduo)
+  * Removed reference to 'sources' gem in documentation
+  * Removed unused block arguments to avoid creating Proc objects. (k-tsj)
+  * RubyGems now asks before overwriting executable wrappers.  Ruby Bug #1800
+  * The bindir is now created with mkdir_p during install. (voxik)
+  * URI scheme matching is no longer case-sensitive.  Fixes #322
+  * ext/builder now checks $MAKE as well as $make (okkez)
+
+=== 1.8.29 / 2013-11-23
+
+Bug fixes:
+
+* Fixed installation when the LANG environment variable is empty.
+* Added DigiCert High Assurance EV Root CA to the default SSL certificates for
+  cloudfront.
+
+=== 1.8.28 / 2013-10-08
+
+Bug fixes:
+
+* Added the Verisign Class 3 Public Primary Certification Authority G5
+  certificate and its intermediary to follow the s3.amazonaws.com certificate
+  change.  Fixes #665 by emeyekayee.  Fixes #671 by jonforums.
+* Remove redundant built-in certificates not needed for https://rubygems.org
+  Fixes #654 by Vít Ondruch.
+* Added test for missing certificates for https://s3.amazonaws.com or
+  https://rubygems.org.  Pull request #673 by Hannes Georg.
+
+=== 1.8.27 / 2013-09-24
+
+Security fixes:
+
+* RubyGems 2.1.4 and earlier are vulnerable to excessive CPU usage due to a
+  backtracking in Gem::Version validation.  See CVE-2013-4363 for full details
+  including vulnerable APIs.  Fixed versions include 2.1.5, 2.0.10, 1.8.27 and
+  1.8.23.2 (for Ruby 1.9.3).
+
+=== 1.8.26 / 2013-09-09
+
+Security fixes:
+
+* RubyGems 2.0.7 and earlier are vulnerable to excessive CPU usage due to a
+  backtracking in Gem::Version validation.  See CVE-2013-4287 for full details
+  including vulnerable APIs.  Fixed versions include 2.0.8, 1.8.26 and
+  1.8.23.1 (for Ruby 1.9.3).  Issue #626 by Damir Sharipov.
+
+Bug fixes:
+
+* Fixed editing of a Makefile with 8-bit characters.  Fixes #181
+
+=== 1.8.25 / 2013-01-24
+
+* Bug fixes:
+  * Added 11627 to setup bin_file location to protect against errors. Fixes
+    #328 by ConradIrwin
+  * Specification#ruby_code didn't handle Requirement with multiple
+  * Fix error on creating a Version object with a frozen string.
+  * Fix incremental index updates
+  * Fix missing load_yaml in YAML-related requirement.rb code.
+  * Manually backport encoding-aware YAML gemspec
+
+=== 1.8.24 / 2012-04-27
+
+* 1 bug fix:
+
+  * Install the .pem files properly. Fixes #320
+  * Remove OpenSSL dependency from the http code path
+
+=== 1.8.23.2 / 2013-09-24
+
+Security fixes:
+
+* RubyGems 2.1.4 and earlier are vulnerable to excessive CPU usage due to a
+  backtracking in Gem::Version validation.  See CVE-2013-4363 for full details
+  including vulnerable APIs.  Fixed versions include 2.1.5, 2.0.10, 1.8.27 and
+  1.8.23.2 (for Ruby 1.9.3).
+
+=== 1.8.23.1 / 2013-09-09
+
+Security fixes:
+
+* RubyGems 2.0.7 and earlier are vulnerable to excessive CPU usage due to a
+  backtracking in Gem::Version validation.  See CVE-2013-4287 for full details
+  including vulnerable APIs.  Fixed versions include 2.0.8, 1.8.26 and
+  1.8.23.1 (for Ruby 1.9.3).  Issue #626 by Damir Sharipov.
+
+=== 1.8.23 / 2012-04-19
+
+This release increases the security used when RubyGems is talking to
+an https server. If you use a custom RubyGems server over SSL, this
+release will cause RubyGems to no longer connect unless your SSL cert
+is globally valid.
+
+You can configure SSL certificate usage in RubyGems through the
+:ssl_ca_cert and :ssl_verify_mode options in ~/.gemrc and /etc/gemrc.
+The recommended way is to set :ssl_ca_cert to the CA certificate for
+your server or a certificate bundle containing your CA certification.
+
+You may also set :ssl_verify_mode to 0 to completely disable SSL
+certificate checks, but this is not recommended.
+
+
+* 2 security fixes:
+  * Disallow redirects from https to http
+  * Turn on verification of server SSL certs
+
+* 1 minor feature:
+  * Add --clear-sources to fetch
+
+* 2 bug fixes:
+  * Use File.identical? to check if two files are the same.
+  * Fixed init_with warning when using psych
+
+=== 1.8.22 / 2012-04-13
+
+* 4 bug fixes:
+
+  * Workaround for psych/syck YAML date parsing issue
+  * Don't trust the encoding of ARGV. Fixes #307
+  * Quiet default warnings about missing spec variables
+  * Read a binary file properly (windows fix)
+
+=== 1.8.21 / 2012-03-22
+
+* 2 bug fixes:
+
+  * Add workaround for buggy yaml output from 1.9.2
+  * Force 1.9.1 to remove it's prelude code. Fixes #305
+
+=== 1.8.20 / 2012-03-21
+
+* 4 bug fixes:
+
+  * Add --force to `gem build` to skip validation. Fixes #297
+  * Gracefully deal with YAML::PrivateType objects in Marshal'd gemspecs
+  * Treat the source as a proper url base. Fixes #304
+  * Warn when updating the specs cache fails. Fixes #300
+
+=== 1.8.19 / 2012-03-14
+
+* 3 bug fixes:
+
+  * Handle loading psych vs syck properly. Fixes #298
+  * Make sure Date objects don't leak in via Marshal
+  * Perform Date => Time coercion on yaml loading. Fixes #266
+
+=== 1.8.18 / 2012-03-11
+
+* 4 bug fixes:
+
+  * Use Psych API to emit more compatible YAML
+  * Download and write inside `gem fetch` directly. Fixes #289
+  * Honor sysconfdir on 1.8. Fixes #291
+  * Search everywhere for a spec for `gem spec`. Fixes #288
+  * Fix Gem.all_load_path. Fixes #171
+
+=== 1.8.17 / 2012-02-17
+
+* 2 minor enhancements:
+
+  * Add MacRuby to the list of special cases for platforms (ferrous26)
+  * Add a default for where to install rubygems itself
+
+* 3 bug fixes:
+
+  * Fixed gem loading issue caused by dependencies not resolving.
+  * Fixed umask error when stdlib is required and unresolved dependencies exist.
+  * Shebang munging would only take one arg after the cmd
+  * Define SUCKAGE better, ie only MRI 1.9.2
+  * Propagate env-shebang to the pristine command if set for install.
+
+=== 1.8.16 / 2012-02-12
+
+* 3 bug fixes:
+
+  * Fix gem specification loading when encoding is not UTF-8. #146
+  * Allow group writable if umask allows it already.
+  * Uniquify the spec list based on directory order priority
+
+=== 1.8.15 / 2012-01-06
+
+* 1 bug fix:
+
+  * Don't eager load yaml, it creates a bad loop. Fixes #256
+
+=== 1.8.14 / 2012-01-05
+
+* 2 bug fixes:
+
+  * Ignore old/bad cache data in Version
+  * Make sure our YAML workarounds are loaded properly. Fixes #250.
+
+=== 1.8.13 / 2011-12-21
+
+* 1 bug fix:
+
+  * Check loaded_specs properly when trying to satisfy a dep
+
+* 2 minor enhancements:
+
+  * Remove using #loaded_path? for performance
+  * Remove Zlib workaround for Windows build.
+
+=== 1.8.12 / 2011-12-02
+
+* Bug fix:
+  * Handle more cases where Syck's DefaultKey showed up in requirements
+    and wasn't cleaned out.
+
+=== 1.8.11 / 2011-10-03
+
+* Bug fix:
+  * Deprecate was moved to Gem::Deprecate to stop polluting the top-level
+    namespace.
+
 === 1.8.10 / 2011-08-25
 
 RubyGems 1.8.10 contains a security fix that prevents malicious gems from
@@ -337,7 +1792,7 @@ Bug Fixes:
 * Added Gem::Specification#dependent_specs.
 * Added Gem::TestCase#new_spec and Gem::TestCase#install_specs.
 * Added flag to include prerelease gems in Gem::SourceIndex#latest_specs.
-* Gem.cache_dir always references the proper cache dir. 
+* Gem.cache_dir always references the proper cache dir.
   Pass true to support a user path.
 * Gem.cache_gem, given a filename always references the cache gem.
   Pass true to support a user path.
@@ -1248,9 +2703,9 @@ There has been some minor usability enhancements and changes ...
   have unit tests.
 * Multiple gem names are allowed on the gem install command line.
   This means you can do:
-  
+
     gem install rake rails needle postgres-pr pimki
-  
+
   (Ok, you get the idea)
 * Multiple authors my be specified in a Gem spec.
 * Switched to using setup.rb (rather than a custom install script) for
@@ -1306,7 +2761,7 @@ See ChangeLog
 * new #required_ruby_version attribute added to gem specification for
   specifying a dependency on which version of ruby the gem needs.  Format it
   accepts is the same as the Gem::Version::Requirement format:
-  
+
     spec.required_ruby_version = "> 1.8.0"
 * --install-stub defaults to true, so library stubs are created
 
@@ -1316,7 +2771,7 @@ See ChangeLog
   incompatibilities.  This has been the subject of much debate for the past
   couple of months, with many ideas and code contributed by Eivind Eklund and
   Mauricio Fernandez.  The following set of assertions shows how it works:
-  
+
     assert_inadequate("1.3", "~> 1.4")
     assert_adequate(  "1.4", "~> 1.4")
     assert_adequate(  "1.5", "~> 1.4")
@@ -1324,7 +2779,7 @@ See ChangeLog
 				       # disallows major version number
 				       # differences.
 * Group gem search output when multiple versions exist for a given gem:
-  
+
     activerecord (0.7.8, 0.7.7, 0.7.6, 0.7.5)
       Implements the ActiveRecord pattern for ORM.
 * Add arbitrary RDoc-able files via gemspec (not just Ruby source files) for

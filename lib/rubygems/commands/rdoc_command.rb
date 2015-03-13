@@ -1,6 +1,7 @@
 require 'rubygems/command'
 require 'rubygems/version_option'
 require 'rubygems/rdoc'
+require 'fileutils'
 
 class Gem::Commands::RdocCommand < Gem::Command
   include Gem::VersionOption
@@ -8,7 +9,7 @@ class Gem::Commands::RdocCommand < Gem::Command
   def initialize
     super 'rdoc', 'Generates RDoc for pre-installed gems',
           :version => Gem::Requirement.default,
-          :include_rdoc => true, :include_ri => true, :overwrite => false
+          :include_rdoc => false, :include_ri => true, :overwrite => false
 
     add_option('--all',
                'Generate RDoc/RI documentation for all',
@@ -39,13 +40,17 @@ class Gem::Commands::RdocCommand < Gem::Command
   end
 
   def defaults_str # :nodoc:
-    "--version '#{Gem::Requirement.default}' --rdoc --ri --no-overwrite"
+    "--version '#{Gem::Requirement.default}' --ri --no-overwrite"
   end
 
   def description # :nodoc:
     <<-DESC
-The rdoc command builds RDoc and RI documentation for installed gems.  Use
---overwrite to force rebuilding of documentation.
+The rdoc command builds documentation for installed gems.  By default
+only documentation is built using rdoc, but additional types of
+documentation may be built through rubygems plugins and the
+Gem.post_installs hook.
+
+Use --overwrite to force rebuilding of documentation.
     DESC
   end
 
@@ -71,6 +76,11 @@ The rdoc command builds RDoc and RI documentation for installed gems.  Use
       doc = Gem::RDoc.new spec, options[:include_rdoc], options[:include_ri]
 
       doc.force = options[:overwrite]
+
+      if options[:overwrite] then
+        FileUtils.rm_rf File.join(spec.doc_dir, 'ri')
+        FileUtils.rm_rf File.join(spec.doc_dir, 'rdoc')
+      end
 
       begin
         doc.generate
